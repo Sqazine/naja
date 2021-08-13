@@ -10,5 +10,5 @@ add_subdirectory(tools)
 
 
 add_executable(najac najac.cpp)
-target_include_directories(najac ${CMAKE_SOURCE_DIR}/libnajac)
-target_link_libraries(najac libnajac)
+target_include_directories(najac PUBLIC ${CMAKE_SOURCE_DIR}/libnajac)
+target_link_libraries(najac PUBLIC libnajac)
