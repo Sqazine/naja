@@ -16,46 +16,48 @@ namespace NajaC
         TOKEN_COMMA,         // ,
         TOKEN_COLON,         // :
         TOKEN_SEMICOLON,     // ;
-        TOKEN_NUMBER_SIGN,   // #
+        TOKEN_POUND,         // #
         TOKEN_LEFT_BRACKET,  // [
         TOKEN_RIGHT_BRACKET, // ]
         TOKEN_LEFT_BRACE,    // {
         TOKEN_RIGHT_BRACE,   // }
         TOKEN_LEFT_PAREN,    // (
         TOKEN_RIGHT_PAREN,   // )
+        TOKEN_AT,            // @
+        TOKEN_QUESTION,      // ?
         TOKEN_PLUS,          // +
         TOKEN_MINUS,         // -
         TOKEN_ASTERISK,      // *
         TOKEN_SLASH,         // /
-        TOKEN_QUESTION,      // ?
         TOKEN_BANG,          // !
         TOKEN_AMPERSAND,     // &
-        TOKEN_VERTICAL_BAR,  // |
+        TOKEN_VBAR,          // |
         TOKEN_CARET,         // ^
         TOKEN_TILDE,         // ~
-        TOKEN_AT,            // @
         TOKEN_EQUAL,         // =
         TOKEN_LESS,          // <
         TOKEN_GREATER,       // >
 
-        TOKEN_EQUAL_EQUAL,               // ==
-        TOKEN_PLUS_EQUAL,                // +=
-        TOKEN_MINUS_EQUAL,               // -=
-        TOKEN_ASTERISK_EQUAL,            // *=
-        TOKEN_SLASH_EQUAL,               // /=
-        TOKEN_LESS_EQUAL,                // <=
-        TOKEN_GREATER_EQUAL,             // >=
-        TOKEN_AMPERSAND_EQUAL,           // &=
-        TOKEN_VERTICAL_BAR_EQUAL,        // |=
-        TOKEN_TILDE_EQUAL,               // ~=
-        TOKEN_CARET_EQUAL,               // ^=
-        TOKEN_BANG_EQUAL,                // !=
-        TOKEN_LESS_LESS_EQUAL,           // <<=
-        TOKEN_GREATER_GREATER_EQUAL,     // >>=
-        TOKEN_PLUS_PLUS,                 // ++
-        TOKEN_MINUS_MINUS,               // --
-        TOKEN_AMPERSAND_AMPERSAND,       // &&
-        TOKEN_VERTICAL_BAR_VERTICAL_BAR, // ||
+        TOKEN_EQUAL_EQUAL,           // ==
+        TOKEN_PLUS_EQUAL,            // +=
+        TOKEN_MINUS_EQUAL,           // -=
+        TOKEN_ASTERISK_EQUAL,        // *=
+        TOKEN_SLASH_EQUAL,           // /=
+        TOKEN_LESS_EQUAL,            // <=
+        TOKEN_GREATER_EQUAL,         // >=
+        TOKEN_AMPERSAND_EQUAL,       // &=
+        TOKEN_VBAR_EQUAL,            // |=
+        TOKEN_TILDE_EQUAL,           // ~=
+        TOKEN_CARET_EQUAL,           // ^=
+        TOKEN_BANG_EQUAL,            // !=
+        TOKEN_LESS_LESS_EQUAL,       // <<=
+        TOKEN_GREATER_GREATER_EQUAL, // >>=
+        TOKEN_PLUS_PLUS,             // ++
+        TOKEN_MINUS_MINUS,           // --
+        TOKEN_AMPERSAND_AMPERSAND,   // &&
+        TOKEN_VBAR_VBAR,             // ||
+        TOKEN_LESS_LESS,             // <<
+        TOKEN_GREATER_GREATER,       // >>
 
         TOKEN_VAR,       // var
         TOKEN_IF,        // if
@@ -63,12 +65,14 @@ namespace NajaC
         TOKEN_TRUE,      // true
         TOKEN_FALSE,     // false
         TOKEN_NULL,      // null
-        TOKEN_while,     // while
+        TOKEN_WHILE,     // while
         TOKEN_FOR,       // for
+        TOKEN_FUNCTION,  // function
         TOKEN_CLASS,     // class
         TOKEN_PUBLIC,    // public
         TOKEN_PROTECTED, // protected
         TOKEN_PRIVATE,   // private
+        TOKEN_OPERATOR,  // operator
 
         TOKEN_UNDEFINED,
         TOKEN_EOF
@@ -83,8 +87,8 @@ namespace NajaC
         uint64_t line;
     };
 
-    std::ostream& operator<<(std::ostream& stream,const Token& token)
+    inline std::ostream &operator<<(std::ostream &stream, const Token &token)
     {
-       return stream<<token.type<<",'"<<token.literal<<"',"<<token.line;
+        return stream << token.type << ",'" << token.literal << "'," << token.line;
     }
 }

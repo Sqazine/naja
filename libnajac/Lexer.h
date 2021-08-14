@@ -19,18 +19,26 @@ namespace NajaC
 
         void ResetStatus();
 
+        bool IsMatchCurChar(char c);
+        bool IsMatchCurCharAndStepOnce(char c);
+
         char GetNextCharAndStepOnce();
         char GetNextChar();
         char GetCurCharAndStepOnce();
         char GetCurChar();
 
-        void AddToken(Token token);
+        void AddToken(TokenType type);
+        void AddToken(TokenType type,std::string_view literal);
 
         bool IsAtEnd();
 
         bool IsNumber(char c);
         bool IsLetter(char c);
         bool IsLetterOrNumber(char c);
+
+        void Number();
+        void Identifier();
+        void String();
 
         uint64_t m_StartPos;
         uint64_t m_CurPos;

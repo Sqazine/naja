@@ -7,7 +7,7 @@ namespace NajaC
     std::string ReadFile(std::string_view path)
     {
         std::fstream file;
-        file.open(path, std::ios::in || std::ios::binary);
+        file.open(path.data(), std::ios::in | std::ios::binary);
         if (!file.is_open())
         {
             std::cout << "failed to open file:" << path << std::endl;
