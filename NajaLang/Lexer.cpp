@@ -20,6 +20,7 @@ namespace NajaLang
             {"protected", TOKEN_PROTECTED},
             {"private", TOKEN_PRIVATE},
             {"operator", TOKEN_OPERATOR},
+            {"return", TOKEN_RETURN},
     };
 
     Lexer::Lexer()
@@ -187,9 +188,10 @@ namespace NajaLang
                 AddToken(TOKEN_GREATER);
             break;
         case '=':
-            if(IsMatchCurCharAndStepOnce('='))
+            if (IsMatchCurCharAndStepOnce('='))
                 AddToken(TOKEN_EQUAL_EQUAL);
-            else AddToken(TOKEN_EQUAL);
+            else
+                AddToken(TOKEN_EQUAL);
             break;
         default:
             if (IsNumber(c))
@@ -214,8 +216,8 @@ namespace NajaLang
     }
     bool Lexer::IsMatchCurCharAndStepOnce(char c)
     {
-        bool result= GetCurChar() == c;
-        if(result)
+        bool result = GetCurChar() == c;
+        if (result)
             m_CurPos++;
         return result;
     }
@@ -308,19 +310,19 @@ namespace NajaLang
 
     void Lexer::String()
     {
-        while(!IsMatchCurChar('\"')&&!IsAtEnd())
-            {
-                if(IsMatchCurChar('\n'))
-                    m_Line++;
-                GetCurCharAndStepOnce();
-            }
+        while (!IsMatchCurChar('\"') && !IsAtEnd())
+        {
+            if (IsMatchCurChar('\n'))
+                m_Line++;
+            GetCurCharAndStepOnce();
+        }
 
-        if(IsAtEnd())
-            std::cout<<"[line "<<m_Line<<"]:Uniterminated string."<<std::endl;
+        if (IsAtEnd())
+            std::cout << "[line " << m_Line << "]:Uniterminated string." << std::endl;
 
-        GetCurCharAndStepOnce();//eat the second '\"'
+        GetCurCharAndStepOnce(); //eat the second '\"'
 
-        AddToken(TOKEN_STRING,m_Source.substr(m_StartPos+1,m_CurPos-m_StartPos-2));
+        AddToken(TOKEN_STRING, m_Source.substr(m_StartPos + 1, m_CurPos - m_StartPos - 2));
     }
 
 }

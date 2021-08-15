@@ -73,6 +73,7 @@ namespace NajaLang
         TOKEN_PROTECTED, // protected
         TOKEN_PRIVATE,   // private
         TOKEN_OPERATOR,  // operator
+        TOKEN_RETURN,// return
 
         TOKEN_UNDEFINED,
         TOKEN_EOF
