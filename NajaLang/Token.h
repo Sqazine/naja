@@ -3,7 +3,7 @@
 #include <string>
 #include <string_view>
 #include <ostream>
-namespace NajaC
+namespace NajaLang
 {
 
     enum TokenType

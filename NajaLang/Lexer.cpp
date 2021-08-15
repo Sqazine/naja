@@ -1,7 +1,7 @@
 #include "Lexer.h"
 #include <unordered_map>
 #include <iostream>
-namespace NajaC
+namespace NajaLang
 {
 
     static std::unordered_map<std::string, TokenType> keywords =

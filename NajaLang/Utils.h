@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include <string_view>
-namespace NajaC
+namespace NajaLang
 {
     std::string ReadFile(std::string_view path);
 }

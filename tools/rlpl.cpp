@@ -1,12 +1,12 @@
 #include <string>
 #include <string>
 #include <iostream>
-#include "libnajac.h"
+#include "NajaLang.h"
 
 void Rlpl()
 {
     std::string line;
-    NajaC::Lexer lexer;
+    NajaLang::Lexer lexer;
     std::cout << "> " << std::endl;
     while (getline(std::cin, line))
     {

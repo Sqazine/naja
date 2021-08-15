@@ -2,7 +2,7 @@
 #include "Token.h"
 #include <vector>
 #include "Ast.h"
-namespace NajaC
+namespace NajaLang
 {
     class Parser
     {

@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-namespace NajaC
+namespace NajaLang
 {
     std::string ReadFile(std::string_view path)
     {

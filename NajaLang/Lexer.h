@@ -4,7 +4,7 @@
 #include <string>
 #include <string_view>
 #include "Token.h"
-namespace NajaC
+namespace NajaLang
 {
     class Lexer
     {

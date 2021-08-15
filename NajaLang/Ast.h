@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-namespace Najac
+namespace NajaLang
 {
     enum AstType
     {
