@@ -23,7 +23,6 @@ namespace NajaLang
         TOKEN_RIGHT_BRACE,   // }
         TOKEN_LEFT_PAREN,    // (
         TOKEN_RIGHT_PAREN,   // )
-        TOKEN_AT,            // @
         TOKEN_QUESTION,      // ?
         TOKEN_PLUS,          // +
         TOKEN_MINUS,         // -

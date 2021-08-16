@@ -80,9 +80,6 @@ namespace NajaLang
         case ';':
             AddToken(TOKEN_SEMICOLON);
             break;
-        case '@':
-            AddToken(TOKEN_AT);
-            break;
         case '?':
             AddToken(TOKEN_QUESTION);
             break;
