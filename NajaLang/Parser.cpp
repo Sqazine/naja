@@ -2,6 +2,17 @@
 #include <iostream>
 namespace NajaLang
 {
+	std::unordered_map<TokenType,PrefixFn> Parser::m_PrefixFunctions =
+		{
+			{TOKEN_IDENTIFIER, &Parser::ParseIdentifierExpr},
+			{TOKEN_NUMBER, &Parser::ParseNumExpr},
+			{TOKEN_STRING, &Parser::ParseStrExpr},
+	};
+
+	std::unordered_map<TokenType,InfixFn> Parser::m_InfixFunctions{
+
+	};
+
 	Parser::Parser()
 	{
 	}
@@ -9,12 +20,12 @@ namespace NajaLang
 	{
 	}
 
-	UniqueRef<Expr> Parser::Parse(const std::vector<Token>& tokens)
+	UniqueRef<Stmt> Parser::Parse(const std::vector<Token> &tokens)
 	{
 		ResetStatus();
 		m_Tokens = tokens;
 
-		return ParseNumExpr();
+		return ParseAstStmts();
 	}
 
 	void Parser::ResetStatus()
@@ -22,17 +33,63 @@ namespace NajaLang
 		m_CurPos = 0;
 		std::vector<Token>().swap(m_Tokens);
 
-	/*	m_Stmts.reset();
-		m_Stmts = CreateUniqueRef<AstStmts>();*/
+		m_Stmts.reset();
+		m_Stmts = CreateUniqueRef<AstStmts>();
+	}
+
+	UniqueRef<Stmt> Parser::ParseAstStmts()
+	{
+		auto result = CreateUniqueRef<AstStmts>();
+
+		while (!IsMatchCurToken(TOKEN_EOF))
+			result->stmts.emplace_back(ParseStmt());
+		return result;
+	}
+
+	UniqueRef<Stmt> Parser::ParseStmt()
+	{
+		return ParseExprStmt();
+	}
+
+	UniqueRef<Stmt> Parser::ParseExprStmt()
+	{
+		auto exprStmt = CreateUniqueRef<ExprStmt>(ParseExpr());
+		Consume(TOKEN_SEMICOLON, "Expect ';' after expr stmt.");
+		return exprStmt;
+	}
+
+	UniqueRef<Expr> Parser::ParseExpr()
+	{
+		if (m_PrefixFunctions.find(GetCurToken().type) == m_PrefixFunctions.end())
+		{
+			std::cout << "no prefix definition for:" << GetCurToken().literal << std::endl;
+			return nullptr;
+		}
+		auto prefixFn = m_PrefixFunctions[GetCurToken().type];
+
+		auto leftExpr = (this->*prefixFn)();
+
+		return leftExpr;
+	}
+
+	UniqueRef<Expr> Parser::ParseIdentifierExpr()
+	{
+		return CreateUniqueRef<IdentifierExpr>(Consume(TOKEN_IDENTIFIER,"Expect a identifier.").literal);
 	}
 
 	UniqueRef<Expr> Parser::ParseNumExpr()
 	{
-		std::string numLiteral = GetCurToken().literal;
+		std::string numLiteral = Consume(TOKEN_NUMBER, "Expexct a number literal.").literal;
 
 		if (numLiteral.find('.') != std::string::npos)
 			return CreateUniqueRef<FloatNumExpr>(std::stod(numLiteral));
-		else return CreateUniqueRef<IntNumExpr>(std::stoll(numLiteral));
+		else
+			return CreateUniqueRef<IntNumExpr>(std::stoll(numLiteral));
+	}
+
+	UniqueRef<Expr> Parser::ParseStrExpr()
+	{
+		return CreateUniqueRef<StrExpr>(Consume(TOKEN_STRING, "Expect a string literal.").literal);
 	}
 
 	Token Parser::GetCurToken()
@@ -101,12 +158,11 @@ namespace NajaLang
 		return GetPreToken().type == type;
 	}
 
-
 	Token Parser::Consume(TokenType type, std::string_view errMsg)
 	{
 		if (IsMatchCurToken(type))
 			return GetCurTokenAndStepOnce();
-		std::cout << errMsg << std::endl;
+		std::cout << "[line " << GetCurToken().line << "]:" << errMsg << std::endl;
 		return m_Tokens.back();
 	}
 

@@ -203,7 +203,8 @@ namespace NajaLang
 
 	void Lexer::ResetStatus()
 	{
-		m_StartPos = m_CurPos = m_Line = 0;
+		m_StartPos = m_CurPos = 0;
+		m_Line = 1;
 		std::vector<Token>().swap(m_Tokens);
 	}
 

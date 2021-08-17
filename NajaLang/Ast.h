@@ -11,7 +11,10 @@ namespace NajaLang
 	{
 		FLOAT_NUM_EXPR,
 		INT_NUM_EXPR,
+		STR_EXPR,
+		IDENTIFIER_EXPR,
 
+		EXPR_STMT,
 		AST_STMTS,
 	};
 
@@ -35,20 +38,20 @@ namespace NajaLang
 
 	struct FloatNumExpr : public Expr
 	{
-		FloatNumExpr() :value(0.0) {}
-		FloatNumExpr(double value) :value(value) {}
+		FloatNumExpr() : value(0.0) {}
+		FloatNumExpr(double value) : value(value) {}
 		~FloatNumExpr() {}
 
 		std::string Stringify() override { return std::to_string(value); }
-		AstType Type() override { return  AstType::FLOAT_NUM_EXPR; }
+		AstType Type() override { return AstType::FLOAT_NUM_EXPR; }
 
 		double value;
 	};
 
 	struct IntNumExpr : public Expr
 	{
-		IntNumExpr() :value(0) {}
-		IntNumExpr(int64_t value) :value(value) {}
+		IntNumExpr() : value(0) {}
+		IntNumExpr(int64_t value) : value(value) {}
 		~IntNumExpr() {}
 
 		std::string Stringify() override { return std::to_string(value); }
@@ -57,7 +60,30 @@ namespace NajaLang
 		int64_t value;
 	};
 
-	struct Stmt:public AstNode
+	struct StrExpr : public Expr
+	{
+		StrExpr() {}
+		StrExpr(std::string_view str) : value(str) {}
+
+		std::string Stringify() override { return value; }
+		AstType Type() override { return AstType::STR_EXPR; }
+
+		std::string value;
+	};
+
+	struct IdentifierExpr:public Expr
+	{
+		IdentifierExpr(){}
+		IdentifierExpr(std::string_view literal):literal(literal){}
+		~IdentifierExpr(){}
+
+		std::string Stringify() override { return literal; }
+		AstType Type() override { return AstType::IDENTIFIER_EXPR; }
+		
+		std::string literal;
+	};
+
+	struct Stmt : public AstNode
 	{
 		Stmt() {}
 		virtual ~Stmt() {}
@@ -65,18 +91,32 @@ namespace NajaLang
 		virtual std::string Stringify() = 0;
 		virtual AstType Type() = 0;
 	};
+
+	struct ExprStmt : public Stmt
+	{
+		ExprStmt() {}
+		ExprStmt(UniqueRef<Expr> expr) : expr(std::move(expr)) {}
+
+		std::string Stringify() override { return expr->Stringify() + ";"; }
+		AstType Type() override { return AstType::EXPR_STMT; }
+
+		UniqueRef<Expr> expr;
+	};
+
 	struct AstStmts : public Stmt
 	{
 		AstStmts() {}
-		AstStmts(std::vector<UniqueRef<Stmt>> stmts) :stmts(std::move(stmts)) {}
+		AstStmts(std::vector<UniqueRef<Stmt>> stmts) : stmts(std::move(stmts)) {}
 		~AstStmts() {}
 
 		std::string Stringify() override
 		{
-			for (const auto& stmt : stmts)
-				stmt->Stringify();
+			std::string result;
+			for (const auto &stmt : stmts)
+				result += stmt->Stringify();
+			return result;
 		}
-		AstType Type() override { return  AstType::AST_STMTS; }
+		AstType Type() override { return AstType::AST_STMTS; }
 
 		std::vector<UniqueRef<Stmt>> stmts;
 	};
