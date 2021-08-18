@@ -57,6 +57,8 @@ namespace NajaLang
 	{
 		if (IsMatchCurToken(TOKEN_VAR))
 			return ParseVarStmt();
+		else if(IsMatchCurToken(TOKEN_RETURN))
+			return ParseReturnStmt();
 		else
 			return ParseExprStmt();
 	}
@@ -94,6 +96,14 @@ namespace NajaLang
 
 		return varStmt;
 	}
+
+		SharedRef<Stmt> Parser::ParseReturnStmt()
+		{
+			Consume(TOKEN_RETURN,"Expect 'return' key word.");
+			auto returnStmt= CreateShared<ReturnStmt>(ParseExpr());
+			Consume(TOKEN_SEMICOLON,"Expect ';' after return stmt");
+			return returnStmt;
+		}
 
 	SharedRef<Expr> Parser::ParseExpr()
 	{

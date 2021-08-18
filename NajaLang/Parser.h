@@ -27,6 +27,7 @@ namespace NajaLang
 		SharedRef<Stmt> ParseStmt();
 		SharedRef<Stmt> ParseExprStmt();
 		SharedRef<Stmt> ParseVarStmt();
+		SharedRef<Stmt> ParseReturnStmt();
 
 		SharedRef<Expr> ParseExpr();
 		SharedRef<Expr> ParseIdentifierExpr();

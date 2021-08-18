@@ -19,6 +19,7 @@ namespace NajaLang
 
 		VAR_STMT,
 		EXPR_STMT,
+		RETURN_STMT,
 		AST_STMTS,
 	};
 
@@ -155,6 +156,17 @@ namespace NajaLang
 		AstType Type() override { return AstType::VAR_STMT; }
 
 		std::unordered_map<SharedRef<IdentifierExpr>, SharedRef<Expr>> variables;
+	};
+
+	struct ReturnStmt:public Stmt
+	{
+		ReturnStmt() {}
+		ReturnStmt(SharedRef<Expr> expr) : expr(expr) {}
+
+		std::string Stringify() override { return "return "+expr->Stringify() + ";"; }
+		AstType Type() override { return AstType::RETURN_STMT; }
+
+		SharedRef<Expr> expr;
 	};
 
 	struct AstStmts : public Stmt
