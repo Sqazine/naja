@@ -10,7 +10,7 @@ namespace NajaLang
 	template <typename T>
 	using SharedRef = std::shared_ptr<T>;
 	template <typename T, typename... Args>
-	constexpr SharedRef<T> CreateSharedRef(Args &&...args)
+	constexpr SharedRef<T> CreateShared(Args &&...args)
 	{
 		return std::make_shared<T>(std::forward<Args>(args)...);
 	}
@@ -18,8 +18,9 @@ namespace NajaLang
 	template <typename T>
 	using UniqueRef = std::unique_ptr<T>;
 	template <typename T, typename... Args>
-	constexpr UniqueRef<T> CreateUniqueRef(Args &&...args)
+	constexpr UniqueRef<T> CreateUnique(Args &&...args)
 	{
 		return std::move(std::make_unique<T>(std::forward<Args>(args)...));
 	}
+
 }

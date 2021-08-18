@@ -9,8 +9,8 @@ namespace NajaLang
 
 	class Parser;
 
-	typedef UniqueRef<Expr> (Parser::*PrefixFn)();
-	typedef UniqueRef<Expr> (Parser::*InfixFn)(UniqueRef<Expr>);
+	typedef SharedRef<Expr> (Parser::*PrefixFn)();
+	typedef SharedRef<Expr> (Parser::*InfixFn)(SharedRef<Expr>);
 
 	class Parser
 	{
@@ -18,19 +18,23 @@ namespace NajaLang
 		Parser();
 		~Parser();
 
-		UniqueRef<Stmt> Parse(const std::vector<Token> &tokens);
+		SharedRef<Stmt> Parse(const std::vector<Token> &tokens);
 
 	private:
 		void ResetStatus();
 
-		UniqueRef<Stmt> ParseAstStmts();
-		UniqueRef<Stmt> ParseStmt();
-		UniqueRef<Stmt> ParseExprStmt();
+		SharedRef<Stmt> ParseAstStmts();
+		SharedRef<Stmt> ParseStmt();
+		SharedRef<Stmt> ParseExprStmt();
+		SharedRef<Stmt> ParseVarStmt();
 
-		UniqueRef<Expr> ParseExpr();
-		UniqueRef<Expr> ParseIdentifierExpr();
-		UniqueRef<Expr> ParseNumExpr();
-		UniqueRef<Expr> ParseStrExpr();
+		SharedRef<Expr> ParseExpr();
+		SharedRef<Expr> ParseIdentifierExpr();
+		SharedRef<Expr> ParseNumExpr();
+		SharedRef<Expr> ParseStrExpr();
+		SharedRef<Expr> ParseNullExpr();
+		SharedRef<Expr> ParseTrueExpr();
+		SharedRef<Expr> ParseFalseExpr();
 
 		Token GetCurToken();
 		Token GetCurTokenAndStepOnce();
@@ -67,7 +71,7 @@ namespace NajaLang
 		bool IsAtEnd();
 
 		int64_t m_CurPos;
-		UniqueRef<AstStmts> m_Stmts;
+		SharedRef<AstStmts> m_Stmts;
 		std::vector<Token> m_Tokens;
 
 		static std::unordered_map<TokenType,PrefixFn> m_PrefixFunctions;

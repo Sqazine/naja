@@ -12,8 +12,12 @@ namespace NajaLang
 		FLOAT_NUM_EXPR,
 		INT_NUM_EXPR,
 		STR_EXPR,
+		NULL_EXPR,
+		TRUE_EXPR,
+		FALSE_EXPR,
 		IDENTIFIER_EXPR,
 
+		VAR_STMT,
 		EXPR_STMT,
 		AST_STMTS,
 	};
@@ -71,15 +75,42 @@ namespace NajaLang
 		std::string value;
 	};
 
-	struct IdentifierExpr:public Expr
+	struct NullExpr : public Expr
 	{
-		IdentifierExpr(){}
-		IdentifierExpr(std::string_view literal):literal(literal){}
-		~IdentifierExpr(){}
+		NullExpr() {}
+		~NullExpr() {}
+
+		std::string Stringify() override { return "null"; }
+		AstType Type() override { return AstType::NULL_EXPR; }
+	};
+
+	struct TrueExpr : public Expr
+	{
+		TrueExpr() {}
+		~TrueExpr() {}
+
+		std::string Stringify() override { return "true"; }
+		AstType Type() override { return AstType::TRUE_EXPR; }
+	};
+
+	struct FalseExpr : public Expr
+	{
+		FalseExpr() {}
+		~FalseExpr() {}
+
+		std::string Stringify() override { return "false"; }
+		AstType Type() override { return AstType::FALSE_EXPR; }
+	};
+
+	struct IdentifierExpr : public Expr
+	{
+		IdentifierExpr() {}
+		IdentifierExpr(std::string_view literal) : literal(literal) {}
+		~IdentifierExpr() {}
 
 		std::string Stringify() override { return literal; }
 		AstType Type() override { return AstType::IDENTIFIER_EXPR; }
-		
+
 		std::string literal;
 	};
 
@@ -95,18 +126,41 @@ namespace NajaLang
 	struct ExprStmt : public Stmt
 	{
 		ExprStmt() {}
-		ExprStmt(UniqueRef<Expr> expr) : expr(std::move(expr)) {}
+		ExprStmt(SharedRef<Expr> expr) : expr(expr) {}
 
 		std::string Stringify() override { return expr->Stringify() + ";"; }
 		AstType Type() override { return AstType::EXPR_STMT; }
 
-		UniqueRef<Expr> expr;
+		SharedRef<Expr> expr;
+	};
+
+	struct VarStmt : public Stmt
+	{
+		VarStmt(){}
+		VarStmt(std::unordered_map<SharedRef<IdentifierExpr>, SharedRef<Expr>> variables) : variables(variables) {}
+		~VarStmt(){}
+
+		std::string Stringify() override
+		{
+			std::string result = "var ";
+			if (!variables.empty())
+			{
+				for (const auto &[key, value] : variables)
+					result += key->Stringify() + "=" + value->Stringify() + ",";
+				result = result.substr(0, result.size() - 1);
+			}
+			result += ";";
+			return result;
+		}
+		AstType Type() override { return AstType::VAR_STMT; }
+
+		std::unordered_map<SharedRef<IdentifierExpr>, SharedRef<Expr>> variables;
 	};
 
 	struct AstStmts : public Stmt
 	{
 		AstStmts() {}
-		AstStmts(std::vector<UniqueRef<Stmt>> stmts) : stmts(std::move(stmts)) {}
+		AstStmts(std::vector<SharedRef<Stmt>> stmts) : stmts(stmts) {}
 		~AstStmts() {}
 
 		std::string Stringify() override
@@ -118,6 +172,6 @@ namespace NajaLang
 		}
 		AstType Type() override { return AstType::AST_STMTS; }
 
-		std::vector<UniqueRef<Stmt>> stmts;
+		std::vector<SharedRef<Stmt>> stmts;
 	};
 }

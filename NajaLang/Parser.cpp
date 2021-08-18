@@ -2,14 +2,21 @@
 #include <iostream>
 namespace NajaLang
 {
-	std::unordered_map<TokenType,PrefixFn> Parser::m_PrefixFunctions =
+
+	const SharedRef<NullExpr> nullExpr = CreateShared<NullExpr>();
+	const SharedRef<TrueExpr> trueExpr = CreateShared<TrueExpr>();
+	const SharedRef<FalseExpr> falseExpr = CreateShared<FalseExpr>();
+
+	std::unordered_map<TokenType, PrefixFn> Parser::m_PrefixFunctions =
 		{
 			{TOKEN_IDENTIFIER, &Parser::ParseIdentifierExpr},
 			{TOKEN_NUMBER, &Parser::ParseNumExpr},
 			{TOKEN_STRING, &Parser::ParseStrExpr},
-	};
+			{TOKEN_NULL, &Parser::ParseNullExpr},
+			{TOKEN_TRUE, &Parser::ParseTrueExpr},
+			{TOKEN_FALSE, &Parser::ParseFalseExpr}};
 
-	std::unordered_map<TokenType,InfixFn> Parser::m_InfixFunctions{
+	std::unordered_map<TokenType, InfixFn> Parser::m_InfixFunctions{
 
 	};
 
@@ -20,7 +27,7 @@ namespace NajaLang
 	{
 	}
 
-	UniqueRef<Stmt> Parser::Parse(const std::vector<Token> &tokens)
+	SharedRef<Stmt> Parser::Parse(const std::vector<Token> &tokens)
 	{
 		ResetStatus();
 		m_Tokens = tokens;
@@ -34,31 +41,61 @@ namespace NajaLang
 		std::vector<Token>().swap(m_Tokens);
 
 		m_Stmts.reset();
-		m_Stmts = CreateUniqueRef<AstStmts>();
+		m_Stmts = CreateShared<AstStmts>();
 	}
 
-	UniqueRef<Stmt> Parser::ParseAstStmts()
+	SharedRef<Stmt> Parser::ParseAstStmts()
 	{
-		auto result = CreateUniqueRef<AstStmts>();
+		auto result = CreateShared<AstStmts>();
 
 		while (!IsMatchCurToken(TOKEN_EOF))
 			result->stmts.emplace_back(ParseStmt());
 		return result;
 	}
 
-	UniqueRef<Stmt> Parser::ParseStmt()
+	SharedRef<Stmt> Parser::ParseStmt()
 	{
-		return ParseExprStmt();
+		if (IsMatchCurToken(TOKEN_VAR))
+			return ParseVarStmt();
+		else
+			return ParseExprStmt();
 	}
 
-	UniqueRef<Stmt> Parser::ParseExprStmt()
+	SharedRef<Stmt> Parser::ParseExprStmt()
 	{
-		auto exprStmt = CreateUniqueRef<ExprStmt>(ParseExpr());
+		auto exprStmt = CreateShared<ExprStmt>(ParseExpr());
 		Consume(TOKEN_SEMICOLON, "Expect ';' after expr stmt.");
 		return exprStmt;
 	}
 
-	UniqueRef<Expr> Parser::ParseExpr()
+	SharedRef<Stmt> Parser::ParseVarStmt()
+	{
+		Consume(TOKEN_VAR, "Expect 'var' key word");
+		auto varStmt = CreateShared<VarStmt>();
+
+		//the first variable
+		auto identifier = CreateShared<IdentifierExpr>(Consume(TOKEN_IDENTIFIER, "Expect valid identifier").literal);
+		SharedRef<Expr> value = nullExpr;
+		if (IsMatchCurTokenAndStepOnce(TOKEN_EQUAL))
+			value = ParseExpr();
+		varStmt->variables[identifier] = value;
+
+		//other variable
+		while (IsMatchCurTokenAndStepOnce(TOKEN_COMMA))
+		{
+			identifier = CreateShared<IdentifierExpr>(Consume(TOKEN_IDENTIFIER, "Expect valid identifier").literal);
+			SharedRef<Expr> value = nullExpr;
+			if (IsMatchCurTokenAndStepOnce(TOKEN_EQUAL))
+				value = ParseExpr();
+			varStmt->variables[identifier] = value;
+		}
+
+		Consume(TOKEN_SEMICOLON, "Expect ';' after var stmt.");
+
+		return varStmt;
+	}
+
+	SharedRef<Expr> Parser::ParseExpr()
 	{
 		if (m_PrefixFunctions.find(GetCurToken().type) == m_PrefixFunctions.end())
 		{
@@ -72,24 +109,40 @@ namespace NajaLang
 		return leftExpr;
 	}
 
-	UniqueRef<Expr> Parser::ParseIdentifierExpr()
+	SharedRef<Expr> Parser::ParseIdentifierExpr()
 	{
-		return CreateUniqueRef<IdentifierExpr>(Consume(TOKEN_IDENTIFIER,"Expect a identifier.").literal);
+		return CreateShared<IdentifierExpr>(Consume(TOKEN_IDENTIFIER, "Expect a identifier.").literal);
 	}
 
-	UniqueRef<Expr> Parser::ParseNumExpr()
+	SharedRef<Expr> Parser::ParseNumExpr()
 	{
 		std::string numLiteral = Consume(TOKEN_NUMBER, "Expexct a number literal.").literal;
 
 		if (numLiteral.find('.') != std::string::npos)
-			return CreateUniqueRef<FloatNumExpr>(std::stod(numLiteral));
+			return CreateShared<FloatNumExpr>(std::stod(numLiteral));
 		else
-			return CreateUniqueRef<IntNumExpr>(std::stoll(numLiteral));
+			return CreateShared<IntNumExpr>(std::stoll(numLiteral));
 	}
 
-	UniqueRef<Expr> Parser::ParseStrExpr()
+	SharedRef<Expr> Parser::ParseStrExpr()
 	{
-		return CreateUniqueRef<StrExpr>(Consume(TOKEN_STRING, "Expect a string literal.").literal);
+		return CreateShared<StrExpr>(Consume(TOKEN_STRING, "Expect a string literal.").literal);
+	}
+
+	SharedRef<Expr> Parser::ParseNullExpr()
+	{
+		Consume(TOKEN_NULL, "Expect 'null' keyword");
+		return nullExpr;
+	}
+	SharedRef<Expr> Parser::ParseTrueExpr()
+	{
+		Consume(TOKEN_TRUE, "Expect 'true' keyword");
+		return trueExpr;
+	}
+	SharedRef<Expr> Parser::ParseFalseExpr()
+	{
+		Consume(TOKEN_FALSE, "Expect 'false' keyword");
+		return falseExpr;
 	}
 
 	Token Parser::GetCurToken()
@@ -107,13 +160,13 @@ namespace NajaLang
 
 	Token Parser::GetNextToken()
 	{
-		if (m_CurPos + 1 < m_Tokens.size())
+		if (m_CurPos + 1 < (int32_t)m_Tokens.size())
 			return m_Tokens[m_CurPos + 1];
 		return m_Tokens.back();
 	}
 	Token Parser::GetNextTokenAndStepOnce()
 	{
-		if (m_CurPos + 1 < m_Tokens.size())
+		if (m_CurPos + 1 < (int32_t)m_Tokens.size())
 			return m_Tokens[++m_CurPos];
 		return m_Tokens.back();
 	}
@@ -168,6 +221,6 @@ namespace NajaLang
 
 	bool Parser::IsAtEnd()
 	{
-		return m_CurPos >= m_Tokens.size();
+		return m_CurPos >= (int32_t)m_Tokens.size();
 	}
 }
