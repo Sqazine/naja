@@ -117,15 +117,15 @@ namespace NajaLang
 
 	struct PrefixExpr : public Expr
 	{
-		PrefixExpr():expr(nullptr) {}
-		PrefixExpr(std::string op, Expr *expr) : op(op),expr(expr) {}
+		PrefixExpr() : expr(nullptr) {}
+		PrefixExpr(std::string op, Expr *expr) : op(op), expr(expr) {}
 		~PrefixExpr()
 		{
 			delete expr;
 			expr = nullptr;
 		}
 
-		std::string Stringify() override { return op+expr->Stringify(); }
+		std::string Stringify() override { return op + expr->Stringify(); }
 		AstType Type() override { return AstType::IDENTIFIER_EXPR; }
 
 		std::string op;
@@ -143,9 +143,13 @@ namespace NajaLang
 
 	struct ExprStmt : public Stmt
 	{
-		ExprStmt():expr(nullptr) {}
+		ExprStmt() : expr(nullptr) {}
 		ExprStmt(Expr *expr) : expr(expr) {}
-		~ExprStmt(){delete expr;expr=nullptr;}
+		~ExprStmt()
+		{
+			delete expr;
+			expr = nullptr;
+		}
 
 		std::string Stringify() override { return expr->Stringify() + ";"; }
 		AstType Type() override { return AstType::EXPR_STMT; }
@@ -178,9 +182,13 @@ namespace NajaLang
 
 	struct ReturnStmt : public Stmt
 	{
-		ReturnStmt():expr(nullptr) {}
+		ReturnStmt() : expr(nullptr) {}
 		ReturnStmt(Expr *expr) : expr(expr) {}
-		~ReturnStmt(){delete expr;expr=nullptr;}
+		~ReturnStmt()
+		{
+			delete expr;
+			expr = nullptr;
+		}
 
 		std::string Stringify() override { return "return " + expr->Stringify() + ";"; }
 		AstType Type() override { return AstType::RETURN_STMT; }
@@ -188,11 +196,45 @@ namespace NajaLang
 		Expr *expr;
 	};
 
+	struct IfStmt : public Stmt
+	{
+		IfStmt() : condition(nullptr), thenBranch(nullptr), elseBranch(nullptr) {}
+		IfStmt(Expr *condition, Stmt *thenBranch, Stmt *elseBranch)
+			: condition(condition),
+			  thenBranch(thenBranch),
+			  elseBranch(elseBranch)
+		{
+		}
+		~IfStmt()
+		{
+			delete condition;
+			condition = nullptr;
+			delete thenBranch;
+			thenBranch = nullptr;
+			delete elseBranch;
+			elseBranch = nullptr;
+		}
+
+		std::string Stringify() override
+		{
+			std::string result;
+			result = "if(" + condition->Stringify() + ")" + thenBranch->Stringify();
+			if (elseBranch != nullptr)
+				result += elseBranch->Stringify();
+			return result;
+		}
+		AstType Type() override { return AstType::RETURN_STMT; }
+
+		Expr *condition;
+		Stmt *thenBranch;
+		Stmt *elseBranch;
+	};
+
 	struct AstStmts : public Stmt
 	{
 		AstStmts() {}
 		AstStmts(std::vector<Stmt *> stmts) : stmts(stmts) {}
-		~AstStmts(){std::vector<Stmt*>().swap(stmts);}
+		~AstStmts() { std::vector<Stmt *>().swap(stmts); }
 
 		std::string Stringify() override
 		{

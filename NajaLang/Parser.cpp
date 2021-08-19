@@ -67,6 +67,8 @@ namespace NajaLang
 			return ParseVarStmt();
 		else if (IsMatchCurToken(TOKEN_RETURN))
 			return ParseReturnStmt();
+		else if(IsMatchCurToken(TOKEN_IF))
+			return ParseIfStmt();
 		else
 			return ParseExprStmt();
 	}
@@ -111,6 +113,25 @@ namespace NajaLang
 		auto returnStmt = new ReturnStmt(ParseExpr());
 		Consume(TOKEN_SEMICOLON, "Expect ';' after return stmt");
 		return returnStmt;
+	}
+
+	Stmt *Parser::ParseIfStmt()
+	{
+		Consume(TOKEN_IF,"Expect 'if' key word.");
+		Consume(TOKEN_LEFT_PAREN,"Expect '(' after 'if'.");
+
+		auto ifStmt=new IfStmt();
+
+		ifStmt->condition=ParseExpr();
+		
+		Consume(TOKEN_RIGHT_PAREN,"Expect ')' after if condition");
+
+		ifStmt->thenBranch=ParseStmt();
+
+		if(IsMatchCurTokenAndStepOnce(TOKEN_ELSE))
+			ifStmt->elseBranch=ParseStmt();
+
+		return ifStmt;
 	}
 
 	Expr *Parser::ParseExpr()
