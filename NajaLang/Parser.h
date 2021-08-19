@@ -28,6 +28,7 @@ namespace NajaLang
 		Stmt* ParseVarStmt();
 		Stmt* ParseReturnStmt();
 		Stmt* ParseIfStmt();
+		Stmt* ParseScopeStmt();
 
 		Expr* ParseExpr();
 		Expr* ParseIdentifierExpr();

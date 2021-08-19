@@ -20,6 +20,8 @@ namespace NajaLang
 		VAR_STMT,
 		EXPR_STMT,
 		RETURN_STMT,
+		IF_STMT,
+		SCOPE_STMT,
 		AST_STMTS,
 	};
 
@@ -223,11 +225,30 @@ namespace NajaLang
 				result += elseBranch->Stringify();
 			return result;
 		}
-		AstType Type() override { return AstType::RETURN_STMT; }
+		AstType Type() override { return AstType::IF_STMT; }
 
 		Expr *condition;
 		Stmt *thenBranch;
 		Stmt *elseBranch;
+	};
+
+	struct ScopeStmt : public Stmt
+	{
+		ScopeStmt() {}
+		ScopeStmt(std::vector<Stmt *> stmts) : stmts(stmts) {}
+		~ScopeStmt() { std::vector<Stmt *>().swap(stmts); }
+
+		std::string Stringify() override
+		{
+			std::string result = "{";
+			for (const auto &stmt : stmts)
+				result += stmt->Stringify();
+			result += "}";
+			return result;
+		}
+
+		AstType Type() override { return AstType::SCOPE_STMT; }
+		std::vector<Stmt *> stmts;
 	};
 
 	struct AstStmts : public Stmt

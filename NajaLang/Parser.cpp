@@ -69,6 +69,8 @@ namespace NajaLang
 			return ParseReturnStmt();
 		else if(IsMatchCurToken(TOKEN_IF))
 			return ParseIfStmt();
+		else if(IsMatchCurToken(TOKEN_LEFT_BRACE))
+			return ParseScopeStmt();
 		else
 			return ParseExprStmt();
 	}
@@ -134,12 +136,22 @@ namespace NajaLang
 		return ifStmt;
 	}
 
+		Stmt* Parser::ParseScopeStmt()
+		{
+			Consume(TOKEN_LEFT_BRACE,"Expect '{'.");
+			auto scopeStmt=new ScopeStmt();
+			while(!IsMatchCurToken(TOKEN_RIGHT_BRACE))
+				scopeStmt->stmts.emplace_back(ParseStmt());
+			Consume(TOKEN_RIGHT_BRACE,"Expect '}'.");
+			return scopeStmt;
+		}
+
 	Expr *Parser::ParseExpr()
 	{
 		if (m_PrefixFunctions.find(GetCurToken().type) == m_PrefixFunctions.end())
 		{
 			std::cout << "no prefix definition for:" << GetCurToken().literal << std::endl;
-			return nullptr;
+			return nullExpr;
 		}
 		auto prefixFn = m_PrefixFunctions[GetCurToken().type];
 
