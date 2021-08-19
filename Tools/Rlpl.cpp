@@ -2,7 +2,7 @@
 #include <string>
 #include <iostream>
 #include "NajaLang.h"
-
+#include "Utils.h"
 void Rlpl()
 {
     std::string line;
@@ -18,9 +18,9 @@ void Rlpl()
     }
 }
 
-void RunFile(std::string_view path)
+void RunFile(std::string path)
 {
-    std::string content = NajaLang::ReadFile(path);
+    std::string content = ReadFile(path);
     NajaLang::Lexer lexer;
     auto tokens = lexer.ScanTokens(content);
     for (const auto &token : tokens)

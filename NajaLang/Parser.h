@@ -3,14 +3,13 @@
 #include <unordered_map>
 #include "Token.h"
 #include "Ast.h"
-#include "Utils.h"
 namespace NajaLang
 {
 
 	class Parser;
 
-	typedef SharedRef<Expr> (Parser::*PrefixFn)();
-	typedef SharedRef<Expr> (Parser::*InfixFn)(SharedRef<Expr>);
+	typedef Expr* (Parser::*PrefixFn)();
+	typedef Expr* (Parser::*InfixFn)(Expr*);
 
 	class Parser
 	{
@@ -18,24 +17,25 @@ namespace NajaLang
 		Parser();
 		~Parser();
 
-		SharedRef<Stmt> Parse(const std::vector<Token> &tokens);
+		Stmt* Parse(const std::vector<Token> &tokens);
 
 	private:
 		void ResetStatus();
 
-		SharedRef<Stmt> ParseAstStmts();
-		SharedRef<Stmt> ParseStmt();
-		SharedRef<Stmt> ParseExprStmt();
-		SharedRef<Stmt> ParseVarStmt();
-		SharedRef<Stmt> ParseReturnStmt();
+		Stmt* ParseAstStmts();
+		Stmt* ParseStmt();
+		Stmt* ParseExprStmt();
+		Stmt* ParseVarStmt();
+		Stmt* ParseReturnStmt();
 
-		SharedRef<Expr> ParseExpr();
-		SharedRef<Expr> ParseIdentifierExpr();
-		SharedRef<Expr> ParseNumExpr();
-		SharedRef<Expr> ParseStrExpr();
-		SharedRef<Expr> ParseNullExpr();
-		SharedRef<Expr> ParseTrueExpr();
-		SharedRef<Expr> ParseFalseExpr();
+		Expr* ParseExpr();
+		Expr* ParseIdentifierExpr();
+		Expr* ParseNumExpr();
+		Expr* ParseStrExpr();
+		Expr* ParseNullExpr();
+		Expr* ParseTrueExpr();
+		Expr* ParseFalseExpr();
+		Expr* ParsePrefixExpr();
 
 		Token GetCurToken();
 		Token GetCurTokenAndStepOnce();
@@ -64,15 +64,15 @@ namespace NajaLang
 		template <typename... T>
 		bool IsMatchPreToken(T... type);
 
-		Token Consume(TokenType type, std::string_view errMsg);
+		Token Consume(TokenType type, std::string errMsg);
 
 		template <typename... T>
-		Token Consume(T... type, std::string_view errMsg);
+		Token Consume(T... type, std::string errMsg);
 
 		bool IsAtEnd();
 
 		int64_t m_CurPos;
-		SharedRef<AstStmts> m_Stmts;
+		AstStmts* m_Stmts;
 		std::vector<Token> m_Tokens;
 
 		static std::unordered_map<TokenType,PrefixFn> m_PrefixFunctions;
@@ -124,7 +124,7 @@ namespace NajaLang
 		return false;
 	}
 	template <typename... T>
-	inline Token Parser::Consume(T... type, std::string_view errMsg)
+	inline Token Parser::Consume(T... type, std::string errMsg)
 	{
 		assert((... && std::is_same_v<T, TokenType>));
 

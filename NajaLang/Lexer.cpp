@@ -31,7 +31,7 @@ namespace NajaLang
 	{
 	}
 
-	const std::vector<Token>& Lexer::ScanTokens(std::string_view src)
+	const std::vector<Token>& Lexer::ScanTokens(std::string src)
 	{
 		ResetStatus();
 		m_Source = src;
@@ -251,7 +251,7 @@ namespace NajaLang
 		auto literal = m_Source.substr(m_StartPos, m_CurPos - m_StartPos);
 		m_Tokens.emplace_back(Token(type, literal, m_Line));
 	}
-	void Lexer::AddToken(TokenType type, std::string_view literal)
+	void Lexer::AddToken(TokenType type, std::string literal)
 	{
 		m_Tokens.emplace_back(Token(type, literal, m_Line));
 	}

@@ -1,10 +1,9 @@
 #pragma once
 #include <string>
 #include <string>
-#include <string_view>
+
 #include <vector>
 #include <memory>
-#include "Utils.h"
 namespace NajaLang
 {
 	enum class AstType
@@ -16,6 +15,7 @@ namespace NajaLang
 		TRUE_EXPR,
 		FALSE_EXPR,
 		IDENTIFIER_EXPR,
+		PREFIX_EXPR,
 
 		VAR_STMT,
 		EXPR_STMT,
@@ -68,7 +68,7 @@ namespace NajaLang
 	struct StrExpr : public Expr
 	{
 		StrExpr() {}
-		StrExpr(std::string_view str) : value(str) {}
+		StrExpr(std::string str) : value(str) {}
 
 		std::string Stringify() override { return value; }
 		AstType Type() override { return AstType::STR_EXPR; }
@@ -106,13 +106,30 @@ namespace NajaLang
 	struct IdentifierExpr : public Expr
 	{
 		IdentifierExpr() {}
-		IdentifierExpr(std::string_view literal) : literal(literal) {}
+		IdentifierExpr(std::string literal) : literal(literal) {}
 		~IdentifierExpr() {}
 
 		std::string Stringify() override { return literal; }
 		AstType Type() override { return AstType::IDENTIFIER_EXPR; }
 
 		std::string literal;
+	};
+
+	struct PrefixExpr : public Expr
+	{
+		PrefixExpr():expr(nullptr) {}
+		PrefixExpr(std::string op, Expr *expr) : op(op),expr(expr) {}
+		~PrefixExpr()
+		{
+			delete expr;
+			expr = nullptr;
+		}
+
+		std::string Stringify() override { return op+expr->Stringify(); }
+		AstType Type() override { return AstType::IDENTIFIER_EXPR; }
+
+		std::string op;
+		Expr *expr;
 	};
 
 	struct Stmt : public AstNode
@@ -126,28 +143,29 @@ namespace NajaLang
 
 	struct ExprStmt : public Stmt
 	{
-		ExprStmt() {}
-		ExprStmt(SharedRef<Expr> expr) : expr(expr) {}
+		ExprStmt():expr(nullptr) {}
+		ExprStmt(Expr *expr) : expr(expr) {}
+		~ExprStmt(){delete expr;expr=nullptr;}
 
 		std::string Stringify() override { return expr->Stringify() + ";"; }
 		AstType Type() override { return AstType::EXPR_STMT; }
 
-		SharedRef<Expr> expr;
+		Expr *expr;
 	};
 
 	struct VarStmt : public Stmt
 	{
-		VarStmt(){}
-		VarStmt(std::unordered_map<SharedRef<IdentifierExpr>, SharedRef<Expr>> variables) : variables(variables) {}
-		~VarStmt(){}
+		VarStmt() {}
+		VarStmt(std::unordered_map<IdentifierExpr *, Expr *> variables) : variables(variables) {}
+		~VarStmt() {}
 
 		std::string Stringify() override
 		{
 			std::string result = "var ";
 			if (!variables.empty())
 			{
-				for (const auto &[key, value] : variables)
-					result += key->Stringify() + "=" + value->Stringify() + ",";
+				for (const auto &variable : variables)
+					result += variable.first->Stringify() + "=" + variable.second->Stringify() + ",";
 				result = result.substr(0, result.size() - 1);
 			}
 			result += ";";
@@ -155,25 +173,26 @@ namespace NajaLang
 		}
 		AstType Type() override { return AstType::VAR_STMT; }
 
-		std::unordered_map<SharedRef<IdentifierExpr>, SharedRef<Expr>> variables;
+		std::unordered_map<IdentifierExpr *, Expr *> variables;
 	};
 
-	struct ReturnStmt:public Stmt
+	struct ReturnStmt : public Stmt
 	{
-		ReturnStmt() {}
-		ReturnStmt(SharedRef<Expr> expr) : expr(expr) {}
+		ReturnStmt():expr(nullptr) {}
+		ReturnStmt(Expr *expr) : expr(expr) {}
+		~ReturnStmt(){delete expr;expr=nullptr;}
 
-		std::string Stringify() override { return "return "+expr->Stringify() + ";"; }
+		std::string Stringify() override { return "return " + expr->Stringify() + ";"; }
 		AstType Type() override { return AstType::RETURN_STMT; }
 
-		SharedRef<Expr> expr;
+		Expr *expr;
 	};
 
 	struct AstStmts : public Stmt
 	{
 		AstStmts() {}
-		AstStmts(std::vector<SharedRef<Stmt>> stmts) : stmts(stmts) {}
-		~AstStmts() {}
+		AstStmts(std::vector<Stmt *> stmts) : stmts(stmts) {}
+		~AstStmts(){std::vector<Stmt*>().swap(stmts);}
 
 		std::string Stringify() override
 		{
@@ -184,6 +203,6 @@ namespace NajaLang
 		}
 		AstType Type() override { return AstType::AST_STMTS; }
 
-		std::vector<SharedRef<Stmt>> stmts;
+		std::vector<Stmt *> stmts;
 	};
 }

@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 project(NajaLang LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_EXTENSION OFF)
 
 file(GLOB NAJA_LANG_SRC "NajaLang/*.h" "NajaLang/*.cpp")

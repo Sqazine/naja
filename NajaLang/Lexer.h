@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <vector>
 #include <string>
-#include <string_view>
+
 #include "Token.h"
 namespace NajaLang
 {
@@ -12,7 +12,7 @@ namespace NajaLang
         Lexer();
         ~Lexer();
 
-       const std::vector<Token>& ScanTokens(std::string_view src);
+       const std::vector<Token>& ScanTokens(std::string src);
     private:
 
         void ScanToken();
@@ -28,7 +28,7 @@ namespace NajaLang
         char GetCurChar();
 
         void AddToken(TokenType type);
-        void AddToken(TokenType type,std::string_view literal);
+        void AddToken(TokenType type,std::string literal);
 
         bool IsAtEnd();
 

@@ -2,8 +2,8 @@
 #include <string>
 #include <iostream>
 #include "NajaLang.h"
-
-void RPpl()
+#include "Utils.h"
+void Rppl()
 {
 	std::string line;
 	NajaLang::Lexer lexer;
@@ -20,9 +20,9 @@ void RPpl()
 	}
 }
 
-void RunFile(std::string_view path)
+void RunFile(std::string path)
 {
-	std::string content = NajaLang::ReadFile(path);
+	std::string content = ReadFile(path);
 	NajaLang::Lexer lexer;
 	NajaLang::Parser parser;
 
@@ -38,7 +38,7 @@ int main(int argc, char** argv)
 	if (argc == 2)
 		RunFile(argv[1]);
 	else if (argc == 1)
-		RPpl();
+		Rppl();
 	else
 		std::cout << "Usage: rlpl [filepath]" << std::endl;
 	return 0;
