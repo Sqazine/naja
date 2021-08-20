@@ -6,10 +6,30 @@
 namespace NajaLang
 {
 
+	enum Precedence
+	{
+		LOWEST,
+		ASSIGN,		 // = += -= *= /= %= &= ^= |= <<= >>=
+		QUESTION,	 // ?
+		LOGIC_OR,	 // ||
+		LOGIC_AND,	 // &&
+		BIT_OR,		 // |
+		BIT_XOR,	 // ^
+		BIT_AND,	 // &
+		EQUAL,		 // == !=
+		COMPARE,	 // < <= > >=
+		BIT_SHIFT,	 // << >>
+		ADD_PLUS,	 // + -
+		MUL_DIV_MOD, // * / %
+					 // PREFIX,		 // ++ -- ! ~ &
+					 // POSTFIX,	 // ++ -- () [] .
+	};
+
 	class Parser;
 
-	typedef Expr* (Parser::*PrefixFn)();
-	typedef Expr* (Parser::*InfixFn)(Expr*);
+	typedef Expr *(Parser::*PrefixFn)();
+	typedef Expr *(Parser::*InfixFn)(Expr *);
+	typedef Expr *(Parser::*PostfixFn)(Expr *);
 
 	class Parser
 	{
@@ -17,27 +37,27 @@ namespace NajaLang
 		Parser();
 		~Parser();
 
-		Stmt* Parse(const std::vector<Token> &tokens);
+		Stmt *Parse(const std::vector<Token> &tokens);
 
 	private:
 		void ResetStatus();
 
-		Stmt* ParseAstStmts();
-		Stmt* ParseStmt();
-		Stmt* ParseExprStmt();
-		Stmt* ParseVarStmt();
-		Stmt* ParseReturnStmt();
-		Stmt* ParseIfStmt();
-		Stmt* ParseScopeStmt();
+		Stmt *ParseAstStmts();
+		Stmt *ParseStmt();
+		Stmt *ParseExprStmt();
+		Stmt *ParseVarStmt();
+		Stmt *ParseReturnStmt();
+		Stmt *ParseIfStmt();
+		Stmt *ParseScopeStmt();
 
-		Expr* ParseExpr();
-		Expr* ParseIdentifierExpr();
-		Expr* ParseNumExpr();
-		Expr* ParseStrExpr();
-		Expr* ParseNullExpr();
-		Expr* ParseTrueExpr();
-		Expr* ParseFalseExpr();
-		Expr* ParsePrefixExpr();
+		Expr *ParseExpr(Precedence precedence = LOWEST);
+		Expr *ParseIdentifierExpr();
+		Expr *ParseNumExpr();
+		Expr *ParseStrExpr();
+		Expr *ParseNullExpr();
+		Expr *ParseTrueExpr();
+		Expr *ParseFalseExpr();
+		Expr *ParsePrefixExpr();
 
 		Token GetCurToken();
 		Token GetCurTokenAndStepOnce();
@@ -74,11 +94,12 @@ namespace NajaLang
 		bool IsAtEnd();
 
 		int64_t m_CurPos;
-		AstStmts* m_Stmts;
+		AstStmts *m_Stmts;
 		std::vector<Token> m_Tokens;
 
-		static std::unordered_map<TokenType,PrefixFn> m_PrefixFunctions;
-		static std::unordered_map<TokenType,InfixFn> m_InfixFunctions;
+		static std::unordered_map<TokenType, PrefixFn> m_PrefixFunctions;
+		static std::unordered_map<TokenType, InfixFn> m_InfixFunctions;
+		static std::unordered_map<TokenType, PostfixFn> m_PostfixFunctions;
 	};
 	template <typename... T>
 	inline bool Parser::IsMatchCurToken(T... type)

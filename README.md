@@ -1,2 +1,2 @@
-# najac
+# NajaLang
 The naja programming language

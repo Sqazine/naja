@@ -19,9 +19,14 @@ namespace NajaLang
 			{TOKEN_BANG, &Parser::ParsePrefixExpr},
 			{TOKEN_TILDE, &Parser::ParsePrefixExpr},
 			{TOKEN_AMPERSAND, &Parser::ParsePrefixExpr},
-	};
+			{TOKEN_PLUS_PLUS, &Parser::ParsePrefixExpr},
+			{TOKEN_MINUS_MINUS, &Parser::ParsePrefixExpr}};
 
 	std::unordered_map<TokenType, InfixFn> Parser::m_InfixFunctions{
+
+	};
+
+	std::unordered_map<TokenType, PostfixFn> Parser::m_PostfixFunctions{
 
 	};
 
@@ -67,9 +72,9 @@ namespace NajaLang
 			return ParseVarStmt();
 		else if (IsMatchCurToken(TOKEN_RETURN))
 			return ParseReturnStmt();
-		else if(IsMatchCurToken(TOKEN_IF))
+		else if (IsMatchCurToken(TOKEN_IF))
 			return ParseIfStmt();
-		else if(IsMatchCurToken(TOKEN_LEFT_BRACE))
+		else if (IsMatchCurToken(TOKEN_LEFT_BRACE))
 			return ParseScopeStmt();
 		else
 			return ParseExprStmt();
@@ -119,38 +124,38 @@ namespace NajaLang
 
 	Stmt *Parser::ParseIfStmt()
 	{
-		Consume(TOKEN_IF,"Expect 'if' key word.");
-		Consume(TOKEN_LEFT_PAREN,"Expect '(' after 'if'.");
+		Consume(TOKEN_IF, "Expect 'if' key word.");
+		Consume(TOKEN_LEFT_PAREN, "Expect '(' after 'if'.");
 
-		auto ifStmt=new IfStmt();
+		auto ifStmt = new IfStmt();
 
-		ifStmt->condition=ParseExpr();
-		
-		Consume(TOKEN_RIGHT_PAREN,"Expect ')' after if condition");
+		ifStmt->condition = ParseExpr();
 
-		ifStmt->thenBranch=ParseStmt();
+		Consume(TOKEN_RIGHT_PAREN, "Expect ')' after if condition");
 
-		if(IsMatchCurTokenAndStepOnce(TOKEN_ELSE))
-			ifStmt->elseBranch=ParseStmt();
+		ifStmt->thenBranch = ParseStmt();
+
+		if (IsMatchCurTokenAndStepOnce(TOKEN_ELSE))
+			ifStmt->elseBranch = ParseStmt();
 
 		return ifStmt;
 	}
 
-		Stmt* Parser::ParseScopeStmt()
-		{
-			Consume(TOKEN_LEFT_BRACE,"Expect '{'.");
-			auto scopeStmt=new ScopeStmt();
-			while(!IsMatchCurToken(TOKEN_RIGHT_BRACE))
-				scopeStmt->stmts.emplace_back(ParseStmt());
-			Consume(TOKEN_RIGHT_BRACE,"Expect '}'.");
-			return scopeStmt;
-		}
+	Stmt *Parser::ParseScopeStmt()
+	{
+		Consume(TOKEN_LEFT_BRACE, "Expect '{'.");
+		auto scopeStmt = new ScopeStmt();
+		while (!IsMatchCurToken(TOKEN_RIGHT_BRACE))
+			scopeStmt->stmts.emplace_back(ParseStmt());
+		Consume(TOKEN_RIGHT_BRACE, "Expect '}'.");
+		return scopeStmt;
+	}
 
-	Expr *Parser::ParseExpr()
+	Expr *Parser::ParseExpr(Precedence precedence)
 	{
 		if (m_PrefixFunctions.find(GetCurToken().type) == m_PrefixFunctions.end())
 		{
-			std::cout << "no prefix definition for:" << GetCurToken().literal << std::endl;
+			std::cout << "no prefix definition for:" << GetCurTokenAndStepOnce().literal << std::endl;
 			return nullExpr;
 		}
 		auto prefixFn = m_PrefixFunctions[GetCurToken().type];
