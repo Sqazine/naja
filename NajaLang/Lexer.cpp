@@ -74,6 +74,7 @@ namespace NajaLang
 			break;
 		case '.':
 			AddToken(TOKEN_DOT);
+			break;
 		case ':':
 			AddToken(TOKEN_COLON);
 			break;
@@ -127,6 +128,12 @@ namespace NajaLang
 			else
 				AddToken(TOKEN_SLASH);
 
+			break;
+		case '%':
+			if(IsMatchCurCharAndStepOnce('='))
+				AddToken(TOKEN_PERCENT_EQUAL);
+			else 
+				AddToken(TOKEN_PERCENT);
 			break;
 		case '!':
 			if (IsMatchCurCharAndStepOnce('='))

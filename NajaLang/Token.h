@@ -28,6 +28,7 @@ namespace NajaLang
         TOKEN_MINUS,         // -
         TOKEN_ASTERISK,      // *
         TOKEN_SLASH,         // /
+        TOKEN_PERCENT,       // %
         TOKEN_BANG,          // !
         TOKEN_AMPERSAND,     // &
         TOKEN_VBAR,          // |
@@ -41,6 +42,7 @@ namespace NajaLang
         TOKEN_PLUS_EQUAL,            // +=
         TOKEN_MINUS_EQUAL,           // -=
         TOKEN_ASTERISK_EQUAL,        // *=
+        TOKEN_PERCENT_EQUAL,         // %=
         TOKEN_SLASH_EQUAL,           // /=
         TOKEN_LESS_EQUAL,            // <=
         TOKEN_GREATER_EQUAL,         // >=

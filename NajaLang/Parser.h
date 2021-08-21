@@ -10,7 +10,7 @@ namespace NajaLang
 	{
 		LOWEST,
 		ASSIGN,		 // = += -= *= /= %= &= ^= |= <<= >>=
-		QUESTION,	 // ?
+		TERNARY,	 // ? :
 		LOGIC_OR,	 // ||
 		LOGIC_AND,	 // &&
 		BIT_OR,		 // |
@@ -21,8 +21,9 @@ namespace NajaLang
 		BIT_SHIFT,	 // << >>
 		ADD_PLUS,	 // + -
 		MUL_DIV_MOD, // * / %
-					 // PREFIX,		 // ++ -- ! ~ &
-					 // POSTFIX,	 // ++ -- () [] .
+
+		// PREFIX,		 // ++ -- ! ~ &
+		// POSTFIX,	 // ++ -- () [] .
 	};
 
 	class Parser;
@@ -58,12 +59,15 @@ namespace NajaLang
 		Expr *ParseTrueExpr();
 		Expr *ParseFalseExpr();
 		Expr *ParsePrefixExpr();
+		Expr *ParseInfixExpr(Expr *prefixExpr);
 
 		Token GetCurToken();
 		Token GetCurTokenAndStepOnce();
+		Precedence GetCurTokenPrecedence();
 
 		Token GetNextToken();
 		Token GetNextTokenAndStepOnce();
+		Precedence GetNextTokenPrecedence();
 
 		Token GetPreToken();
 
@@ -100,6 +104,7 @@ namespace NajaLang
 		static std::unordered_map<TokenType, PrefixFn> m_PrefixFunctions;
 		static std::unordered_map<TokenType, InfixFn> m_InfixFunctions;
 		static std::unordered_map<TokenType, PostfixFn> m_PostfixFunctions;
+		static std::unordered_map<TokenType, Precedence> m_Precedence;
 	};
 	template <typename... T>
 	inline bool Parser::IsMatchCurToken(T... type)
