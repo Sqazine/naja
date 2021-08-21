@@ -310,10 +310,10 @@ namespace NajaLang
 		std::string literal = m_Source.substr(m_StartPos, m_CurPos - m_StartPos);
 
 		bool isKeyWord = false;
-		for (const auto& [key, value] : keywords)
-			if (key.compare(literal) == 0)
+		for (const auto& keyword : keywords)
+			if (keyword.first.compare(literal) == 0)
 			{
-				AddToken(value, literal);
+				AddToken(keyword.second, literal);
 				isKeyWord = true;
 				break;
 			}
