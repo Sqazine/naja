@@ -24,49 +24,50 @@ namespace NajaLang
 
 	std::unordered_map<TokenType, InfixFn> Parser::m_InfixFunctions =
 		{
-			{TOKEN_EQUAL,&Parser::ParseInfixExpr},
-			{TOKEN_PLUS_EQUAL,&Parser::ParseInfixExpr},
+			{TOKEN_EQUAL, &Parser::ParseInfixExpr},
+			{TOKEN_PLUS_EQUAL, &Parser::ParseInfixExpr},
 			{TOKEN_MINUS_EQUAL, &Parser::ParseInfixExpr},
 			{TOKEN_ASTERISK_EQUAL, &Parser::ParseInfixExpr},
 			{TOKEN_SLASH_EQUAL, &Parser::ParseInfixExpr},
-			{TOKEN_PERCENT_EQUAL,&Parser::ParseInfixExpr},
-			{TOKEN_AMPERSAND_EQUAL,&Parser::ParseInfixExpr},
-			{TOKEN_CARET_EQUAL,&Parser::ParseInfixExpr},
-			{TOKEN_VBAR_EQUAL,&Parser::ParseInfixExpr},
-			{TOKEN_LESS_LESS_EQUAL,&Parser::ParseInfixExpr},
-			{TOKEN_GREATER_GREATER_EQUAL,&Parser::ParseInfixExpr},
+			{TOKEN_PERCENT_EQUAL, &Parser::ParseInfixExpr},
+			{TOKEN_AMPERSAND_EQUAL, &Parser::ParseInfixExpr},
+			{TOKEN_CARET_EQUAL, &Parser::ParseInfixExpr},
+			{TOKEN_VBAR_EQUAL, &Parser::ParseInfixExpr},
+			{TOKEN_LESS_LESS_EQUAL, &Parser::ParseInfixExpr},
+			{TOKEN_GREATER_GREATER_EQUAL, &Parser::ParseInfixExpr},
 
-			{TOKEN_QUESTION,&Parser::ParseInfixExpr},
-			{TOKEN_COLON,&Parser::ParseInfixExpr},
+			{TOKEN_QUESTION, &Parser::ParseInfixExpr},
+			{TOKEN_COLON, &Parser::ParseInfixExpr},
 
-			{TOKEN_VBAR_VBAR,&Parser::ParseInfixExpr},
-			{TOKEN_AMPERSAND_AMPERSAND,&Parser::ParseInfixExpr},
-			
-			{TOKEN_VBAR,&Parser::ParseInfixExpr},
-			{TOKEN_CARET,&Parser::ParseInfixExpr},
-			{TOKEN_AMPERSAND,&Parser::ParseInfixExpr},
+			{TOKEN_VBAR_VBAR, &Parser::ParseInfixExpr},
+			{TOKEN_AMPERSAND_AMPERSAND, &Parser::ParseInfixExpr},
 
-			{TOKEN_EQUAL_EQUAL,&Parser::ParseInfixExpr},
-			{TOKEN_BANG_EQUAL,&Parser::ParseInfixExpr},
+			{TOKEN_VBAR, &Parser::ParseInfixExpr},
+			{TOKEN_CARET, &Parser::ParseInfixExpr},
+			{TOKEN_AMPERSAND, &Parser::ParseInfixExpr},
 
+			{TOKEN_EQUAL_EQUAL, &Parser::ParseInfixExpr},
+			{TOKEN_BANG_EQUAL, &Parser::ParseInfixExpr},
 
-			{TOKEN_LESS,&Parser::ParseInfixExpr},
-			{TOKEN_LESS_EQUAL,&Parser::ParseInfixExpr},
-			{TOKEN_GREATER,&Parser::ParseInfixExpr},
-			{TOKEN_GREATER_EQUAL,&Parser::ParseInfixExpr},
-			
-			{TOKEN_LESS_LESS,&Parser::ParseInfixExpr},
-			{TOKEN_GREATER_GREATER,&Parser::ParseInfixExpr},
+			{TOKEN_LESS, &Parser::ParseInfixExpr},
+			{TOKEN_LESS_EQUAL, &Parser::ParseInfixExpr},
+			{TOKEN_GREATER, &Parser::ParseInfixExpr},
+			{TOKEN_GREATER_EQUAL, &Parser::ParseInfixExpr},
+
+			{TOKEN_LESS_LESS, &Parser::ParseInfixExpr},
+			{TOKEN_GREATER_GREATER, &Parser::ParseInfixExpr},
 
 			{TOKEN_PLUS, &Parser::ParseInfixExpr},
 			{TOKEN_MINUS, &Parser::ParseInfixExpr},
 			{TOKEN_ASTERISK, &Parser::ParseInfixExpr},
 			{TOKEN_SLASH, &Parser::ParseInfixExpr},
-			{TOKEN_PERCENT,&Parser::ParseInfixExpr},
+			{TOKEN_PERCENT, &Parser::ParseInfixExpr},
 	};
 
 	std::unordered_map<TokenType, PostfixFn> Parser::m_PostfixFunctions = {
 
+		{TOKEN_PLUS_PLUS,&Parser::ParsePostfixExpr},
+		{TOKEN_MINUS_MINUS,&Parser::ParsePostfixExpr},
 	};
 
 	std::unordered_map<TokenType, Precedence> Parser::m_Precedence = {
@@ -112,6 +113,9 @@ namespace NajaLang
 		{TOKEN_ASTERISK, MUL_DIV_MOD},
 		{TOKEN_SLASH, MUL_DIV_MOD},
 		{TOKEN_PERCENT, MUL_DIV_MOD},
+
+		{TOKEN_PLUS_PLUS, POSTFIX},
+		{TOKEN_MINUS_MINUS, POSTFIX},
 	};
 
 	Parser::Parser()
@@ -248,12 +252,24 @@ namespace NajaLang
 
 		while (!IsMatchCurToken(TOKEN_SEMICOLON) && precedence < GetCurTokenPrecedence())
 		{
-			if (m_InfixFunctions.find(GetCurToken().type) == m_InfixFunctions.end())
-				return leftExpr;
+			if (GetCurTokenPrecedence() != POSTFIX)
+			{
+				if (m_InfixFunctions.find(GetCurToken().type) == m_InfixFunctions.end())
+					return leftExpr;
 
-			auto infixFn = m_InfixFunctions[GetCurToken().type];
+				auto infixFn = m_InfixFunctions[GetCurToken().type];
 
-			leftExpr = (this->*infixFn)(leftExpr);
+				leftExpr = (this->*infixFn)(leftExpr);
+			}
+			else
+			{
+				if(m_PostfixFunctions.find(GetCurToken().type)==m_PostfixFunctions.end())
+					return leftExpr;
+				
+				auto postFixFn=m_PostfixFunctions[GetCurToken().type];
+
+				leftExpr=(this->*postFixFn)(leftExpr);
+			}
 		}
 
 		return leftExpr;
@@ -299,7 +315,7 @@ namespace NajaLang
 	{
 		auto prefixExpr = new PrefixExpr();
 		prefixExpr->op = GetCurTokenAndStepOnce().literal;
-		prefixExpr->expr = ParseExpr();
+		prefixExpr->right = ParseExpr();
 		return prefixExpr;
 	}
 
@@ -310,6 +326,14 @@ namespace NajaLang
 		infixExpr->op = GetCurTokenAndStepOnce().literal;
 		infixExpr->right = ParseExpr(GetCurTokenPrecedence());
 		return infixExpr;
+	}
+
+	Expr *Parser::ParsePostfixExpr(Expr *prefixExpr)
+	{
+		auto postfixExpr = new PostfixExpr();
+		postfixExpr->left = prefixExpr;
+		postfixExpr->op = GetCurTokenAndStepOnce().literal;
+		return postfixExpr;
 	}
 
 	Token Parser::GetCurToken()

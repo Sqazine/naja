@@ -17,6 +17,7 @@ namespace NajaLang
 		IDENTIFIER_EXPR,
 		PREFIX_EXPR,
 		INFIX_EXPR,
+		POSTFIX_EXPR,
 
 		VAR_STMT,
 		EXPR_STMT,
@@ -120,19 +121,19 @@ namespace NajaLang
 
 	struct PrefixExpr : public Expr
 	{
-		PrefixExpr() : expr(nullptr) {}
-		PrefixExpr(std::string op, Expr *expr) : op(op), expr(expr) {}
+		PrefixExpr() : right(nullptr) {}
+		PrefixExpr(std::string op, Expr *right) : op(op), right(right) {}
 		~PrefixExpr()
 		{
-			delete expr;
-			expr = nullptr;
+			delete right;
+			right = nullptr;
 		}
 
-		std::string Stringify() override { return op + expr->Stringify(); }
+		std::string Stringify() override { return op + right->Stringify(); }
 		AstType Type() override { return AstType::PREFIX_EXPR; }
 
 		std::string op;
-		Expr *expr;
+		Expr *right;
 	};
 
 	struct InfixExpr : public Expr
@@ -154,6 +155,23 @@ namespace NajaLang
 		std::string op;
 		Expr *left;
 		Expr *right;
+	};
+
+	struct PostfixExpr : public Expr
+	{
+		PostfixExpr() : left(nullptr) {}
+		PostfixExpr(Expr* left,std::string op) : op(op), left(left) {}
+		~PostfixExpr()
+		{
+			delete left;
+			left = nullptr;
+		}
+
+		std::string Stringify() override { return left->Stringify()+op; }
+		AstType Type() override { return AstType::POSTFIX_EXPR; }
+
+		Expr *left;
+		std::string op;
 	};
 
 	struct Stmt : public AstNode
