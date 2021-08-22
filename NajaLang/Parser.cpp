@@ -164,6 +164,8 @@ namespace NajaLang
 			return ParseIfStmt();
 		else if (IsMatchCurToken(TOKEN_LEFT_BRACE))
 			return ParseScopeStmt();
+		else if(IsMatchCurToken(TOKEN_WHILE))
+			return ParseWhileStmt();
 		else
 			return ParseExprStmt();
 	}
@@ -238,6 +240,22 @@ namespace NajaLang
 		Consume(TOKEN_RIGHT_BRACE, "Expect '}'.");
 		return scopeStmt;
 	}
+
+		Stmt *Parser::ParseWhileStmt()
+		{
+			Consume(TOKEN_WHILE,"Expect 'while' keyword.");
+			Consume(TOKEN_LEFT_PAREN,"Expect '(' after 'while'.");
+
+			auto whileStmt=new WhileStmt();
+
+			whileStmt->condition=ParseExpr(LOWEST);
+
+			Consume(TOKEN_RIGHT_PAREN,"Expect ')' after while stmt's condition.");
+
+			whileStmt->stmt=ParseStmt();
+
+			return whileStmt;
+		}
 
 	Expr *Parser::ParseExpr(Precedence precedence)
 	{

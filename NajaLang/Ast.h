@@ -24,6 +24,7 @@ namespace NajaLang
 		RETURN_STMT,
 		IF_STMT,
 		SCOPE_STMT,
+		WHILE_STMT,
 		AST_STMTS,
 	};
 
@@ -160,14 +161,14 @@ namespace NajaLang
 	struct PostfixExpr : public Expr
 	{
 		PostfixExpr() : left(nullptr) {}
-		PostfixExpr(Expr* left,std::string op) : op(op), left(left) {}
+		PostfixExpr(Expr *left, std::string op) : op(op), left(left) {}
 		~PostfixExpr()
 		{
 			delete left;
 			left = nullptr;
 		}
 
-		std::string Stringify() override { return left->Stringify()+op; }
+		std::string Stringify() override { return left->Stringify() + op; }
 		AstType Type() override { return AstType::POSTFIX_EXPR; }
 
 		Expr *left;
@@ -289,6 +290,32 @@ namespace NajaLang
 
 		AstType Type() override { return AstType::SCOPE_STMT; }
 		std::vector<Stmt *> stmts;
+	};
+
+	struct WhileStmt : public Stmt
+	{
+		WhileStmt() : condition(nullptr), stmt(nullptr) {}
+		WhileStmt(Expr *condition, Stmt *stmt)
+			: condition(condition),
+			  stmt(stmt)
+		{
+		}
+		~WhileStmt()
+		{
+			delete condition;
+			condition = nullptr;
+			delete stmt;
+			stmt = nullptr;
+		}
+
+		std::string Stringify() override
+		{
+			return "while(" + condition->Stringify() + ")" + stmt->Stringify();
+		}
+		AstType Type() override { return AstType::WHILE_STMT; }
+
+		Expr *condition;
+		Stmt *stmt;
 	};
 
 	struct AstStmts : public Stmt

@@ -14,6 +14,8 @@ namespace NajaLang
 		{"null", TOKEN_NULL},
 		{"while", TOKEN_WHILE},
 		{"for", TOKEN_FOR},
+		{"break",TOKEN_BREAK},
+		{"continue",TOKEN_CONTINUE},
 		{"function", TOKEN_FUNCTION},
 		{"class", TOKEN_CLASS},
 		{"public", TOKEN_PUBLIC},

@@ -68,6 +68,8 @@ namespace NajaLang
         TOKEN_NULL,      // null
         TOKEN_WHILE,     // while
         TOKEN_FOR,       // for
+        TOKEN_BREAK,     // break
+        TOKEN_CONTINUE,  // continue
         TOKEN_FUNCTION,  // function
         TOKEN_CLASS,     // class
         TOKEN_PUBLIC,    // public
