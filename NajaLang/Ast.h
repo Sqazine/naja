@@ -25,6 +25,7 @@ namespace NajaLang
 		IF_STMT,
 		SCOPE_STMT,
 		WHILE_STMT,
+		BREAK_STMT,
 		AST_STMTS,
 	};
 
@@ -316,6 +317,15 @@ namespace NajaLang
 
 		Expr *condition;
 		Stmt *stmt;
+	};
+
+		struct BreakStmt : public Stmt
+	{
+		BreakStmt() {}
+		~BreakStmt() {}
+
+		std::string Stringify() override { return "break;"; }
+		AstType Type() override { return AstType::BREAK_STMT; }
 	};
 
 	struct AstStmts : public Stmt

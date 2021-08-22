@@ -52,6 +52,7 @@ namespace NajaLang
 		Stmt *ParseScopeStmt();
 		Stmt *ParseWhileStmt();
 		Stmt *ParseForStmt();
+		Stmt *ParseBreakStmt();
 
 		Expr *ParseExpr(Precedence precedence = LOWEST);
 		Expr *ParseIdentifierExpr();

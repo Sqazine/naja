@@ -168,6 +168,8 @@ namespace NajaLang
 			return ParseWhileStmt();
 		else if(IsMatchCurToken(TOKEN_FOR))
 			return ParseForStmt();
+		else if(IsMatchCurToken(TOKEN_BREAK))
+			return ParseBreakStmt();
 		else
 			return ParseExprStmt();
 	}
@@ -329,6 +331,14 @@ namespace NajaLang
 
 		return forStmt;
 	}
+
+			Stmt *Parser::ParseBreakStmt()
+			{
+				Consume(TOKEN_BREAK,"Expect 'break' keyword.");
+				auto breakStmt=	new BreakStmt();
+				Consume(TOKEN_SEMICOLON,"Expect ';' after break stmt.");
+				return breakStmt;
+			}
 
 	Expr *Parser::ParseExpr(Precedence precedence)
 	{
