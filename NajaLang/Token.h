@@ -16,7 +16,6 @@ namespace NajaLang
         TOKEN_COMMA,         // ,
         TOKEN_COLON,         // :
         TOKEN_SEMICOLON,     // ;
-        TOKEN_POUND,         // #
         TOKEN_LEFT_BRACKET,  // [
         TOKEN_RIGHT_BRACKET, // ]
         TOKEN_LEFT_BRACE,    // {

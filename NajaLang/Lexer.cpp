@@ -5,24 +5,24 @@ namespace NajaLang
 {
 
 	static std::unordered_map<std::string, TokenType> keywords =
-	{
-		{"var", TOKEN_VAR},
-		{"if", TOKEN_IF},
-		{"else", TOKEN_ELSE},
-		{"true", TOKEN_TRUE},
-		{"false", TOKEN_FALSE},
-		{"null", TOKEN_NULL},
-		{"while", TOKEN_WHILE},
-		{"for", TOKEN_FOR},
-		{"break",TOKEN_BREAK},
-		{"continue",TOKEN_CONTINUE},
-		{"function", TOKEN_FUNCTION},
-		{"class", TOKEN_CLASS},
-		{"public", TOKEN_PUBLIC},
-		{"protected", TOKEN_PROTECTED},
-		{"private", TOKEN_PRIVATE},
-		{"operator", TOKEN_OPERATOR},
-		{"return", TOKEN_RETURN},
+		{
+			{"var", TOKEN_VAR},
+			{"if", TOKEN_IF},
+			{"else", TOKEN_ELSE},
+			{"true", TOKEN_TRUE},
+			{"false", TOKEN_FALSE},
+			{"null", TOKEN_NULL},
+			{"while", TOKEN_WHILE},
+			{"for", TOKEN_FOR},
+			{"break", TOKEN_BREAK},
+			{"continue", TOKEN_CONTINUE},
+			{"function", TOKEN_FUNCTION},
+			{"class", TOKEN_CLASS},
+			{"public", TOKEN_PUBLIC},
+			{"protected", TOKEN_PROTECTED},
+			{"private", TOKEN_PRIVATE},
+			{"operator", TOKEN_OPERATOR},
+			{"return", TOKEN_RETURN},
 	};
 
 	Lexer::Lexer()
@@ -33,7 +33,7 @@ namespace NajaLang
 	{
 	}
 
-	const std::vector<Token>& Lexer::ScanTokens(std::string src)
+	const std::vector<Token> &Lexer::ScanTokens(std::string src)
 	{
 		ResetStatus();
 		m_Source = src;
@@ -96,12 +96,6 @@ namespace NajaLang
 		case '\n':
 			m_Line++;
 			break;
-		case '#':
-			while (!IsMatchCurCharAndStepOnce('\n') && !IsAtEnd())
-				;
-			GetCurCharAndStepOnce(); //eat '\n'
-			m_Line++;
-			break;
 		case '+':
 			if (IsMatchCurCharAndStepOnce('+'))
 				AddToken(TOKEN_PLUS_PLUS);
@@ -127,14 +121,37 @@ namespace NajaLang
 		case '/':
 			if (IsMatchCurCharAndStepOnce('='))
 				AddToken(TOKEN_SLASH_EQUAL);
+			else if (IsMatchCurCharAndStepOnce('/'))
+			{
+				while (!IsMatchCurChar('\n') && !IsAtEnd())
+					GetCurCharAndStepOnce();
+				m_Line++;
+			}
+			else if (IsMatchCurCharAndStepOnce('*'))
+			{
+				while (!IsAtEnd())
+				{
+					if (IsMatchCurChar('\n'))
+						m_Line++;
+					else if (IsMatchCurChar('*') && IsMatchNextChar('/'))
+					{	
+						GetCurCharAndStepOnce();
+						GetCurCharAndStepOnce();
+						break;
+
+					}
+					else
+						GetCurCharAndStepOnce();
+				}
+			}
 			else
 				AddToken(TOKEN_SLASH);
 
 			break;
 		case '%':
-			if(IsMatchCurCharAndStepOnce('='))
+			if (IsMatchCurCharAndStepOnce('='))
 				AddToken(TOKEN_PERCENT_EQUAL);
-			else 
+			else
 				AddToken(TOKEN_PERCENT);
 			break;
 		case '!':
@@ -229,6 +246,18 @@ namespace NajaLang
 		return result;
 	}
 
+	bool Lexer::IsMatchNextChar(char c)
+	{
+		return GetNextChar() == c;
+	}
+	bool Lexer::IsMatchNextCharAndStepOnce(char c)
+	{
+		bool result = GetNextChar() == c;
+		if (result)
+			m_CurPos++;
+		return result;
+	}
+
 	char Lexer::GetNextCharAndStepOnce()
 	{
 		if (m_CurPos + 1 < m_Source.size())
@@ -296,7 +325,7 @@ namespace NajaLang
 			else
 			{
 				AddToken(TOKEN_NUMBER, m_Source.substr(m_StartPos, m_CurPos - m_StartPos - 1));
-				AddToken(TOKEN_DOT,m_Source.substr(m_CurPos-1,1));
+				AddToken(TOKEN_DOT, m_Source.substr(m_CurPos - 1, 1));
 				return;
 			}
 		}
@@ -312,7 +341,7 @@ namespace NajaLang
 		std::string literal = m_Source.substr(m_StartPos, m_CurPos - m_StartPos);
 
 		bool isKeyWord = false;
-		for (const auto& keyword : keywords)
+		for (const auto &keyword : keywords)
 			if (keyword.first.compare(literal) == 0)
 			{
 				AddToken(keyword.second, literal);
