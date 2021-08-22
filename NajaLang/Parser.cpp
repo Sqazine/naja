@@ -66,8 +66,8 @@ namespace NajaLang
 
 	std::unordered_map<TokenType, PostfixFn> Parser::m_PostfixFunctions = {
 
-		{TOKEN_PLUS_PLUS,&Parser::ParsePostfixExpr},
-		{TOKEN_MINUS_MINUS,&Parser::ParsePostfixExpr},
+		{TOKEN_PLUS_PLUS, &Parser::ParsePostfixExpr},
+		{TOKEN_MINUS_MINUS, &Parser::ParsePostfixExpr},
 	};
 
 	std::unordered_map<TokenType, Precedence> Parser::m_Precedence = {
@@ -164,8 +164,10 @@ namespace NajaLang
 			return ParseIfStmt();
 		else if (IsMatchCurToken(TOKEN_LEFT_BRACE))
 			return ParseScopeStmt();
-		else if(IsMatchCurToken(TOKEN_WHILE))
+		else if (IsMatchCurToken(TOKEN_WHILE))
 			return ParseWhileStmt();
+		else if(IsMatchCurToken(TOKEN_FOR))
+			return ParseForStmt();
 		else
 			return ParseExprStmt();
 	}
@@ -241,21 +243,92 @@ namespace NajaLang
 		return scopeStmt;
 	}
 
-		Stmt *Parser::ParseWhileStmt()
+	Stmt *Parser::ParseWhileStmt()
+	{
+		Consume(TOKEN_WHILE, "Expect 'while' keyword.");
+		Consume(TOKEN_LEFT_PAREN, "Expect '(' after 'while'.");
+
+		auto whileStmt = new WhileStmt();
+
+		whileStmt->condition = ParseExpr(LOWEST);
+
+		Consume(TOKEN_RIGHT_PAREN, "Expect ')' after while stmt's condition.");
+
+		whileStmt->stmt = ParseStmt();
+
+		return whileStmt;
+	}
+
+	Stmt *Parser::ParseForStmt()
+	{
+		//for(i=0;j=0;i<10&&j<20;++i,++j)
+		//{
+		//	//for loop part...
+		//}
+		
+		// |
+		// v
+
+		//{
+		//	i=0;j=0;
+		//	while(i<10&&j<10)
+		//	{
+		//		//for loop part... 
+		//		++i;++j;
+		//	}
+		//}
+		Consume(TOKEN_FOR, "Expect 'for' keyword.");
+		Consume(TOKEN_LEFT_PAREN, "Expect '(' after 'for'.");
+
+		auto forStmt = new ScopeStmt();
+
+		if (!IsMatchCurToken(TOKEN_SEMICOLON)) //has initializer
 		{
-			Consume(TOKEN_WHILE,"Expect 'while' keyword.");
-			Consume(TOKEN_LEFT_PAREN,"Expect '(' after 'while'.");
-
-			auto whileStmt=new WhileStmt();
-
-			whileStmt->condition=ParseExpr(LOWEST);
-
-			Consume(TOKEN_RIGHT_PAREN,"Expect ')' after while stmt's condition.");
-
-			whileStmt->stmt=ParseStmt();
-
-			return whileStmt;
+			if (IsMatchCurToken(TOKEN_VAR)) // var decl initializer
+				forStmt->stmts.emplace_back(ParseVarStmt());
+			else //exprStmt
+			{
+				//the first exprStmt
+				
+				forStmt->stmts.emplace_back(new ExprStmt(ParseExpr()));
+				while (IsMatchCurTokenAndStepOnce(TOKEN_COMMA))
+					forStmt->stmts.emplace_back(new ExprStmt(ParseExpr()));
+		Consume(TOKEN_SEMICOLON,"Expect ';' after initialize part of 'for' stmt");
+			}
 		}
+
+
+		auto forCondition=ParseExpr();
+
+		Consume(TOKEN_SEMICOLON,"Expect ';' after 'for' stmt condition part.");
+
+		std::vector<ExprStmt*> independentVariables;
+		if(!IsMatchCurToken(TOKEN_RIGHT_PAREN))
+		{
+			independentVariables.emplace_back(new ExprStmt(ParseExpr()));
+			while(IsMatchCurTokenAndStepOnce(TOKEN_COMMA))
+			independentVariables.emplace_back(new ExprStmt(ParseExpr()));
+		}
+
+		Consume(TOKEN_RIGHT_PAREN,"Expect ')' after 'for' stmt.");
+
+		auto loopBody=new ScopeStmt();
+
+		//for loop body is a scope stmt
+		if(IsMatchCurToken(TOKEN_LEFT_BRACE))
+			loopBody->stmts.emplace_back(ParseScopeStmt());
+		else//for loop body is a expr stmt
+			loopBody->stmts.emplace_back(ParseExprStmt());
+
+		for(auto& independentVariable:independentVariables)
+		loopBody->stmts.emplace_back(independentVariable);
+
+		auto whileStmt=new WhileStmt(forCondition,loopBody);
+
+		forStmt->stmts.emplace_back(whileStmt);
+
+		return forStmt;
+	}
 
 	Expr *Parser::ParseExpr(Precedence precedence)
 	{
@@ -281,12 +354,12 @@ namespace NajaLang
 			}
 			else
 			{
-				if(m_PostfixFunctions.find(GetCurToken().type)==m_PostfixFunctions.end())
+				if (m_PostfixFunctions.find(GetCurToken().type) == m_PostfixFunctions.end())
 					return leftExpr;
-				
-				auto postFixFn=m_PostfixFunctions[GetCurToken().type];
 
-				leftExpr=(this->*postFixFn)(leftExpr);
+				auto postFixFn = m_PostfixFunctions[GetCurToken().type];
+
+				leftExpr = (this->*postFixFn)(leftExpr);
 			}
 		}
 
