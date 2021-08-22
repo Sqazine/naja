@@ -26,6 +26,7 @@ namespace NajaLang
 		SCOPE_STMT,
 		WHILE_STMT,
 		BREAK_STMT,
+		CONTINUE_STMT,
 		AST_STMTS,
 	};
 
@@ -319,13 +320,22 @@ namespace NajaLang
 		Stmt *stmt;
 	};
 
-		struct BreakStmt : public Stmt
+	struct BreakStmt : public Stmt
 	{
 		BreakStmt() {}
 		~BreakStmt() {}
 
 		std::string Stringify() override { return "break;"; }
 		AstType Type() override { return AstType::BREAK_STMT; }
+	};
+
+	struct ContinueStmt : public Stmt
+	{
+		ContinueStmt() {}
+		~ContinueStmt() {}
+
+		std::string Stringify() override { return "continue;"; }
+		AstType Type() override { return AstType::CONTINUE_STMT; }
 	};
 
 	struct AstStmts : public Stmt

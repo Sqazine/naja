@@ -166,10 +166,12 @@ namespace NajaLang
 			return ParseScopeStmt();
 		else if (IsMatchCurToken(TOKEN_WHILE))
 			return ParseWhileStmt();
-		else if(IsMatchCurToken(TOKEN_FOR))
+		else if (IsMatchCurToken(TOKEN_FOR))
 			return ParseForStmt();
-		else if(IsMatchCurToken(TOKEN_BREAK))
+		else if (IsMatchCurToken(TOKEN_BREAK))
 			return ParseBreakStmt();
+		else if (IsMatchCurToken(TOKEN_CONTINUE))
+			return ParseContinueStmt();
 		else
 			return ParseExprStmt();
 	}
@@ -267,7 +269,7 @@ namespace NajaLang
 		//{
 		//	//for loop part...
 		//}
-		
+
 		// |
 		// v
 
@@ -275,7 +277,7 @@ namespace NajaLang
 		//	i=0;j=0;
 		//	while(i<10&&j<10)
 		//	{
-		//		//for loop part... 
+		//		//for loop part...
 		//		++i;++j;
 		//	}
 		//}
@@ -291,54 +293,61 @@ namespace NajaLang
 			else //exprStmt
 			{
 				//the first exprStmt
-				
+
 				forStmt->stmts.emplace_back(new ExprStmt(ParseExpr()));
 				while (IsMatchCurTokenAndStepOnce(TOKEN_COMMA))
 					forStmt->stmts.emplace_back(new ExprStmt(ParseExpr()));
-		Consume(TOKEN_SEMICOLON,"Expect ';' after initialize part of 'for' stmt");
+				Consume(TOKEN_SEMICOLON, "Expect ';' after initialize part of 'for' stmt");
 			}
 		}
 
+		auto forCondition = ParseExpr();
 
-		auto forCondition=ParseExpr();
+		Consume(TOKEN_SEMICOLON, "Expect ';' after 'for' stmt condition part.");
 
-		Consume(TOKEN_SEMICOLON,"Expect ';' after 'for' stmt condition part.");
-
-		std::vector<ExprStmt*> independentVariables;
-		if(!IsMatchCurToken(TOKEN_RIGHT_PAREN))
+		std::vector<ExprStmt *> independentVariables;
+		if (!IsMatchCurToken(TOKEN_RIGHT_PAREN))
 		{
 			independentVariables.emplace_back(new ExprStmt(ParseExpr()));
-			while(IsMatchCurTokenAndStepOnce(TOKEN_COMMA))
-			independentVariables.emplace_back(new ExprStmt(ParseExpr()));
+			while (IsMatchCurTokenAndStepOnce(TOKEN_COMMA))
+				independentVariables.emplace_back(new ExprStmt(ParseExpr()));
 		}
 
-		Consume(TOKEN_RIGHT_PAREN,"Expect ')' after 'for' stmt.");
+		Consume(TOKEN_RIGHT_PAREN, "Expect ')' after 'for' stmt.");
 
-		auto loopBody=new ScopeStmt();
+		auto loopBody = new ScopeStmt();
 
 		//for loop body is a scope stmt
-		if(IsMatchCurToken(TOKEN_LEFT_BRACE))
+		if (IsMatchCurToken(TOKEN_LEFT_BRACE))
 			loopBody->stmts.emplace_back(ParseScopeStmt());
-		else//for loop body is a expr stmt
+		else //for loop body is a expr stmt
 			loopBody->stmts.emplace_back(ParseExprStmt());
 
-		for(auto& independentVariable:independentVariables)
-		loopBody->stmts.emplace_back(independentVariable);
+		for (auto &independentVariable : independentVariables)
+			loopBody->stmts.emplace_back(independentVariable);
 
-		auto whileStmt=new WhileStmt(forCondition,loopBody);
+		auto whileStmt = new WhileStmt(forCondition, loopBody);
 
 		forStmt->stmts.emplace_back(whileStmt);
 
 		return forStmt;
 	}
 
-			Stmt *Parser::ParseBreakStmt()
-			{
-				Consume(TOKEN_BREAK,"Expect 'break' keyword.");
-				auto breakStmt=	new BreakStmt();
-				Consume(TOKEN_SEMICOLON,"Expect ';' after break stmt.");
-				return breakStmt;
-			}
+	Stmt *Parser::ParseBreakStmt()
+	{
+		Consume(TOKEN_BREAK, "Expect 'break' keyword.");
+		auto breakStmt = new BreakStmt();
+		Consume(TOKEN_SEMICOLON, "Expect ';' after break stmt.");
+		return breakStmt;
+	}
+
+	Stmt *Parser::ParseContinueStmt()
+	{
+		Consume(TOKEN_CONTINUE, "Expect 'continue' keyword.");
+		auto continueStmt = new ContinueStmt();
+		Consume(TOKEN_SEMICOLON, "Expect ';' after continue stmt.");
+		return continueStmt;
+	}
 
 	Expr *Parser::ParseExpr(Precedence precedence)
 	{
