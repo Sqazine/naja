@@ -15,6 +15,7 @@ namespace NajaLang
 		TRUE_EXPR,
 		FALSE_EXPR,
 		IDENTIFIER_EXPR,
+		FUNCTION_EXPR,
 		PREFIX_EXPR,
 		INFIX_EXPR,
 		POSTFIX_EXPR,
@@ -29,6 +30,30 @@ namespace NajaLang
 		CONTINUE_STMT,
 		AST_STMTS,
 	};
+
+	struct AstNode;
+	struct Expr;
+	struct FloatNumExpr;
+	struct IntNumExpr;
+	struct StrNumExpr;
+	struct NullNumExpr;
+	struct TrueNumExpr;
+	struct FalseNumExpr;
+	struct IdentifierNumExpr;
+	struct FunctionNumExpr;
+	struct PrefixNumExpr;
+	struct InfixNumExpr;
+	struct PostfixNumExpr;
+	struct Stmt;
+	struct VarStmt;
+	struct ExprStmt;
+	struct ReturnStmt;
+	struct IfStmt;
+	struct ScopeStmt;
+	struct WhileStmt;
+	struct BreakStmt;
+	struct ContinueStmt;
+	struct AstStmts;
 
 	struct AstNode
 	{
@@ -292,6 +317,31 @@ namespace NajaLang
 
 		AstType Type() override { return AstType::SCOPE_STMT; }
 		std::vector<Stmt *> stmts;
+	};
+
+	struct FunctionExpr : public Expr
+	{
+		FunctionExpr() {}
+		FunctionExpr(std::vector<IdentifierExpr *> parameters, ScopeStmt *functionBody) : parameters(parameters), functionBody(functionBody) {}
+		~FunctionExpr() {}
+
+		std::string Stringify() override
+		{
+			std::string result = "function(";
+			if (!parameters.empty())
+			{
+				for (auto param : parameters)
+					result += param->Stringify() + ",";
+				result = result.substr(0, result.size() - 1);
+			}
+			result += ")";
+			result += functionBody->Stringify();
+			return result;
+		}
+		AstType Type() override { return AstType::FUNCTION_EXPR; }
+
+		std::vector<IdentifierExpr *> parameters;
+		ScopeStmt *functionBody;
 	};
 
 	struct WhileStmt : public Stmt

@@ -62,6 +62,7 @@ namespace NajaLang
 		Expr *ParseNullExpr();
 		Expr *ParseTrueExpr();
 		Expr *ParseFalseExpr();
+		Expr* ParseFunctionExpr();
 		Expr *ParsePrefixExpr();
 		Expr *ParseInfixExpr(Expr *prefixExpr);
 		Expr *ParsePostfixExpr(Expr *prefixExpr);

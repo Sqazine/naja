@@ -20,7 +20,10 @@ namespace NajaLang
 			{TOKEN_TILDE, &Parser::ParsePrefixExpr},
 			{TOKEN_AMPERSAND, &Parser::ParsePrefixExpr},
 			{TOKEN_PLUS_PLUS, &Parser::ParsePrefixExpr},
-			{TOKEN_MINUS_MINUS, &Parser::ParsePrefixExpr}};
+			{TOKEN_MINUS_MINUS, &Parser::ParsePrefixExpr},
+			{TOKEN_FUNCTION, &Parser::ParseFunctionExpr},
+
+	};
 
 	std::unordered_map<TokenType, InfixFn> Parser::m_InfixFunctions =
 		{
@@ -419,6 +422,29 @@ namespace NajaLang
 	{
 		Consume(TOKEN_FALSE, "Expect 'false' keyword");
 		return falseExpr;
+	}
+
+	Expr *Parser::ParseFunctionExpr()
+	{
+		Consume(TOKEN_FUNCTION, "Expect 'function' keyword");
+		Consume(TOKEN_LEFT_PAREN, "Expect '(' after 'function' keyword");
+		auto funcExpr = new FunctionExpr();
+
+		if (!IsMatchCurToken(TOKEN_RIGHT_PAREN)) //has parameter
+		{
+			IdentifierExpr* idenExpr=(IdentifierExpr*)ParseIdentifierExpr();
+			funcExpr->parameters.emplace_back(idenExpr);
+			while (IsMatchCurTokenAndStepOnce(TOKEN_COMMA))
+				{
+					idenExpr=(IdentifierExpr*)ParseIdentifierExpr();
+					funcExpr->parameters.emplace_back(idenExpr);
+				}
+		}
+		Consume(TOKEN_RIGHT_PAREN,"Expect ')' after function expr's '('");
+
+		funcExpr->functionBody=(ScopeStmt*)ParseScopeStmt();
+
+		return funcExpr;
 	}
 
 	Expr *Parser::ParsePrefixExpr()
