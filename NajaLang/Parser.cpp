@@ -22,6 +22,7 @@ namespace NajaLang
 			{TOKEN_PLUS_PLUS, &Parser::ParsePrefixExpr},
 			{TOKEN_MINUS_MINUS, &Parser::ParsePrefixExpr},
 			{TOKEN_FUNCTION, &Parser::ParseFunctionExpr},
+			{TOKEN_LEFT_BRACKET,&Parser::ParseArrayExpr}
 
 	};
 
@@ -474,6 +475,24 @@ namespace NajaLang
 		funcExpr->body = (ScopeStmt *)ParseScopeStmt();
 
 		return funcExpr;
+	}
+
+	Expr* Parser::ParseArrayExpr()
+	{
+		Consume(TOKEN_LEFT_BRACKET,"Expect '['.");
+
+		auto arrayExpr = new ArrayExpr();
+		if (!IsMatchCurToken(TOKEN_RIGHT_BRACKET))
+		{
+			//first element
+			arrayExpr->elements.emplace_back(ParseExpr());
+			while(IsMatchCurTokenAndStepOnce(TOKEN_COMMA))
+				arrayExpr->elements.emplace_back(ParseExpr());
+		}
+
+		Consume(TOKEN_RIGHT_BRACKET, "Expect ']'.");
+
+		return arrayExpr;
 	}
 
 	Expr *Parser::ParsePrefixExpr()

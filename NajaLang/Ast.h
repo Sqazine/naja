@@ -16,6 +16,7 @@ namespace NajaLang
 		FALSE_EXPR,
 		IDENTIFIER_EXPR,
 		FUNCTION_EXPR,
+		ARRAY_EXPR,
 		PREFIX_EXPR,
 		INFIX_EXPR,
 		POSTFIX_EXPR,
@@ -146,6 +147,29 @@ namespace NajaLang
 		AstType Type() override { return AstType::IDENTIFIER_EXPR; }
 
 		std::string literal;
+	};
+
+	struct ArrayExpr :public Expr
+	{
+		ArrayExpr() {}
+		ArrayExpr(std::vector<Expr*> elements) : elements(elements) {}
+		~ArrayExpr() {}
+
+		std::string Stringify() override { 
+			std::string result = "[";
+
+			if (!elements.empty())
+			{
+				for (auto e : elements)
+					result += e->Stringify() + ",";
+				result = result.substr(0, result.size() - 1);
+			}
+			result += "]";
+			return result;
+		}
+		AstType Type() override { return AstType::ARRAY_EXPR; }
+
+		std::vector<Expr*> elements;
 	};
 
 	struct PrefixExpr : public Expr
