@@ -15,6 +15,7 @@ namespace NajaLang
 		TRUE_EXPR,
 		FALSE_EXPR,
 		IDENTIFIER_EXPR,
+		GROUP_EXPR,
 		FUNCTION_EXPR,
 		ARRAY_EXPR,
 		TABLE_EXPR,
@@ -157,9 +158,9 @@ namespace NajaLang
 		ArrayExpr() {}
 		ArrayExpr(std::vector<Expr *> elements) : elements(elements) {}
 		~ArrayExpr()
-		 {
-			 std::vector<Expr *>().swap(elements);
-		 }
+		{
+			std::vector<Expr *>().swap(elements);
+		}
 
 		std::string Stringify() override
 		{
@@ -183,7 +184,7 @@ namespace NajaLang
 	{
 		TableExpr() {}
 		TableExpr(std::map<Expr *, Expr *> elements) : elements(elements) {}
-		~TableExpr(){std::map<Expr *, Expr *>().swap(elements);}
+		~TableExpr() { std::map<Expr *, Expr *>().swap(elements); }
 
 		std::string Stringify() override
 		{
@@ -201,6 +202,18 @@ namespace NajaLang
 		AstType Type() override { return AstType::TABLE_EXPR; }
 
 		std::map<Expr *, Expr *> elements;
+	};
+
+	struct GroupExpr : public Expr
+	{
+		GroupExpr() {}
+		GroupExpr(Expr *expr) : expr(expr) {}
+		~GroupExpr() {}
+
+		std::string Stringify() override { return "(" + expr->Stringify() + ")"; }
+		AstType Type() override { return AstType::GROUP_EXPR; }
+
+		Expr *expr;
 	};
 
 	struct PrefixExpr : public Expr
@@ -260,7 +273,7 @@ namespace NajaLang
 
 	struct TernaryExpr : public Expr
 	{
-		TernaryExpr():condition(nullptr),trueBranch(nullptr),falseBranch(nullptr) {}
+		TernaryExpr() : condition(nullptr), trueBranch(nullptr), falseBranch(nullptr) {}
 		TernaryExpr(std::string firstOp, std::string secondOp, Expr *condition, Expr *trueBranch, Expr *falseBranch) : firstOp(firstOp), secondOp(secondOp), condition(condition), trueBranch(trueBranch), falseBranch(falseBranch)
 		{
 		}
@@ -313,7 +326,7 @@ namespace NajaLang
 	{
 		VarStmt() {}
 		VarStmt(std::unordered_map<IdentifierExpr *, Expr *> variables) : variables(variables) {}
-		~VarStmt() {std::unordered_map<IdentifierExpr*,Expr*>().swap(variables);}
+		~VarStmt() { std::unordered_map<IdentifierExpr *, Expr *>().swap(variables); }
 
 		std::string Stringify() override
 		{
@@ -403,13 +416,13 @@ namespace NajaLang
 
 	struct FunctionExpr : public Expr
 	{
-		FunctionExpr():body(nullptr) {}
+		FunctionExpr() : body(nullptr) {}
 		FunctionExpr(std::vector<IdentifierExpr *> parameters, ScopeStmt *body) : parameters(parameters), body(body) {}
-		~FunctionExpr() 
+		~FunctionExpr()
 		{
 			std::vector<IdentifierExpr *>().swap(parameters);
 			delete body;
-			body=nullptr;
+			body = nullptr;
 		}
 
 		std::string Stringify() override
@@ -477,18 +490,18 @@ namespace NajaLang
 
 	struct FunctionStmt : public Stmt
 	{
-		FunctionStmt():name(nullptr),body(nullptr) {}
+		FunctionStmt() : name(nullptr), body(nullptr) {}
 		FunctionStmt(IdentifierExpr *name, std::vector<IdentifierExpr *> parameters, ScopeStmt *body) : name(name), parameters(parameters), body(body) {}
 		~FunctionStmt()
-		 {
-			 delete name;
-			 name=nullptr;
+		{
+			delete name;
+			name = nullptr;
 
-			 std::vector<IdentifierExpr *>().swap(parameters);
+			std::vector<IdentifierExpr *>().swap(parameters);
 
-			 delete body;
-			 body=nullptr;
-		 }
+			delete body;
+			body = nullptr;
+		}
 
 		std::string Stringify() override
 		{

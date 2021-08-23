@@ -21,6 +21,7 @@ namespace NajaLang
 		{TOKEN_AMPERSAND, &Parser::ParsePrefixExpr},
 		{TOKEN_PLUS_PLUS, &Parser::ParsePrefixExpr},
 		{TOKEN_MINUS_MINUS, &Parser::ParsePrefixExpr},
+		{TOKEN_LEFT_PAREN,&Parser::ParseGroupExpr},
 		{TOKEN_FUNCTION, &Parser::ParseFunctionExpr},
 		{TOKEN_LEFT_BRACKET,&Parser::ParseArrayExpr},
 		{TOKEN_LEFT_BRACE,&Parser::ParseTableExpr},
@@ -453,6 +454,15 @@ namespace NajaLang
 		Consume(TOKEN_FALSE, "Expect 'false' keyword");
 		return falseExpr;
 	}
+
+		Expr* Parser::ParseGroupExpr()
+		{
+			Consume(TOKEN_LEFT_PAREN,"Expect '('.");
+			auto groupExpr=new GroupExpr();
+			groupExpr->expr=ParseExpr();
+			Consume(TOKEN_RIGHT_PAREN,"Expect ')'.");
+			return groupExpr;
+		}
 
 	Expr* Parser::ParseFunctionExpr()
 	{
