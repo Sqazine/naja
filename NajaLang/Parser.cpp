@@ -175,6 +175,8 @@ namespace NajaLang
 			return ParseBreakStmt();
 		else if (IsMatchCurToken(TOKEN_CONTINUE))
 			return ParseContinueStmt();
+		else if(IsMatchCurToken(TOKEN_FUNCTION))
+			return ParseFunctionStmt();
 		else
 			return ParseExprStmt();
 	}
@@ -352,6 +354,33 @@ namespace NajaLang
 		return continueStmt;
 	}
 
+	Stmt *Parser::ParseFunctionStmt()
+	{
+		Consume(TOKEN_FUNCTION, "Expect 'function' keyword");
+
+		auto funcStmt = new FunctionStmt();
+
+		funcStmt->name = (IdentifierExpr *)ParseIdentifierExpr();
+
+		Consume(TOKEN_LEFT_PAREN, "Expect '(' after function name.");
+
+		if (!IsMatchCurToken(TOKEN_RIGHT_PAREN)) //has parameter
+		{
+			IdentifierExpr *idenExpr = (IdentifierExpr *)ParseIdentifierExpr();
+			funcStmt->parameters.emplace_back(idenExpr);
+			while (IsMatchCurTokenAndStepOnce(TOKEN_COMMA))
+			{
+				idenExpr = (IdentifierExpr *)ParseIdentifierExpr();
+				funcStmt->parameters.emplace_back(idenExpr);
+			}
+		}
+		Consume(TOKEN_RIGHT_PAREN, "Expect ')' after function expr's '('");
+
+		funcStmt->body = (ScopeStmt *)ParseScopeStmt();
+
+		return funcStmt;
+	}
+
 	Expr *Parser::ParseExpr(Precedence precedence)
 	{
 		if (m_PrefixFunctions.find(GetCurToken().type) == m_PrefixFunctions.end())
@@ -432,17 +461,17 @@ namespace NajaLang
 
 		if (!IsMatchCurToken(TOKEN_RIGHT_PAREN)) //has parameter
 		{
-			IdentifierExpr* idenExpr=(IdentifierExpr*)ParseIdentifierExpr();
+			IdentifierExpr *idenExpr = (IdentifierExpr *)ParseIdentifierExpr();
 			funcExpr->parameters.emplace_back(idenExpr);
 			while (IsMatchCurTokenAndStepOnce(TOKEN_COMMA))
-				{
-					idenExpr=(IdentifierExpr*)ParseIdentifierExpr();
-					funcExpr->parameters.emplace_back(idenExpr);
-				}
+			{
+				idenExpr = (IdentifierExpr *)ParseIdentifierExpr();
+				funcExpr->parameters.emplace_back(idenExpr);
+			}
 		}
-		Consume(TOKEN_RIGHT_PAREN,"Expect ')' after function expr's '('");
+		Consume(TOKEN_RIGHT_PAREN, "Expect ')' after function expr's '('");
 
-		funcExpr->functionBody=(ScopeStmt*)ParseScopeStmt();
+		funcExpr->body = (ScopeStmt *)ParseScopeStmt();
 
 		return funcExpr;
 	}

@@ -28,6 +28,7 @@ namespace NajaLang
 		WHILE_STMT,
 		BREAK_STMT,
 		CONTINUE_STMT,
+		FUNCTION_STMT,
 		AST_STMTS,
 	};
 
@@ -322,7 +323,7 @@ namespace NajaLang
 	struct FunctionExpr : public Expr
 	{
 		FunctionExpr() {}
-		FunctionExpr(std::vector<IdentifierExpr *> parameters, ScopeStmt *functionBody) : parameters(parameters), functionBody(functionBody) {}
+		FunctionExpr(std::vector<IdentifierExpr *> parameters, ScopeStmt *body) : parameters(parameters), body(body) {}
 		~FunctionExpr() {}
 
 		std::string Stringify() override
@@ -335,13 +336,13 @@ namespace NajaLang
 				result = result.substr(0, result.size() - 1);
 			}
 			result += ")";
-			result += functionBody->Stringify();
+			result += body->Stringify();
 			return result;
 		}
 		AstType Type() override { return AstType::FUNCTION_EXPR; }
 
 		std::vector<IdentifierExpr *> parameters;
-		ScopeStmt *functionBody;
+		ScopeStmt *body;
 	};
 
 	struct WhileStmt : public Stmt
@@ -386,6 +387,32 @@ namespace NajaLang
 
 		std::string Stringify() override { return "continue;"; }
 		AstType Type() override { return AstType::CONTINUE_STMT; }
+	};
+
+	struct FunctionStmt : public Stmt
+	{
+		FunctionStmt() {}
+		FunctionStmt(IdentifierExpr* name, std::vector<IdentifierExpr *> parameters, ScopeStmt *body) : name(name), parameters(parameters), body(body) {}
+		~FunctionStmt() {}
+
+		std::string Stringify() override
+		{
+			std::string result = "function " + name->Stringify() + "(";
+			if (!parameters.empty())
+			{
+				for (auto param : parameters)
+					result += param->Stringify() + ",";
+				result = result.substr(0, result.size() - 1);
+			}
+			result += ")";
+			result += body->Stringify();
+			return result;
+		}
+		AstType Type() override { return AstType::FUNCTION_STMT; }
+
+		IdentifierExpr* name;
+		std::vector<IdentifierExpr *> parameters;
+		ScopeStmt *body;
 	};
 
 	struct AstStmts : public Stmt
