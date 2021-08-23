@@ -395,7 +395,36 @@ namespace NajaLang
 		auto classStmt = new ClassStmt();
 		classStmt->name = (IdentifierExpr *)ParseIdentifierExpr();
 
-		Consume(TOKEN_LEFT_BRACE, "Expect '{' after class name.");
+		if (IsMatchCurTokenAndStepOnce(TOKEN_COLON))
+		{
+
+			if (IsMatchCurTokenAndStepOnce(TOKEN_PUBLIC))
+				classStmt->publicInherits.emplace_back((IdentifierExpr *)ParseIdentifierExpr());
+			else if (IsMatchCurTokenAndStepOnce(TOKEN_PROTECTED))
+				classStmt->protectedInherits.emplace_back((IdentifierExpr *)ParseIdentifierExpr());
+			else
+			{
+				if (IsMatchCurToken(TOKEN_PRIVATE))
+					GetCurTokenAndStepOnce();
+				classStmt->privateInherits.emplace_back((IdentifierExpr *)ParseIdentifierExpr());
+			}
+
+			while (IsMatchCurTokenAndStepOnce(TOKEN_COMMA))
+			{
+				if (IsMatchCurTokenAndStepOnce(TOKEN_PUBLIC))
+					classStmt->publicInherits.emplace_back((IdentifierExpr *)ParseIdentifierExpr());
+				else if (IsMatchCurTokenAndStepOnce(TOKEN_PROTECTED))
+					classStmt->protectedInherits.emplace_back((IdentifierExpr *)ParseIdentifierExpr());
+				else
+				{
+					if (IsMatchCurToken(TOKEN_PRIVATE))
+						GetCurTokenAndStepOnce();
+					classStmt->privateInherits.emplace_back((IdentifierExpr *)ParseIdentifierExpr());
+				}
+			}
+		}
+
+		Consume(TOKEN_LEFT_BRACE, "Expect '{' after class name or inherit chain.");
 
 		while (!IsMatchCurToken(TOKEN_RIGHT_BRACE))
 		{

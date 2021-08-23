@@ -155,22 +155,22 @@ namespace NajaLang
 		std::string literal;
 	};
 
-		struct ThisExpr:public Expr
+	struct ThisExpr : public Expr
 	{
 		ThisExpr() {}
 		~ThisExpr() {}
 
 		std::string Stringify() override { return "this"; }
-		AstType Type() override { return AstType::THIS_EXPR; }	
+		AstType Type() override { return AstType::THIS_EXPR; }
 	};
 
-	struct BaseExpr:public Expr
+	struct BaseExpr : public Expr
 	{
 		BaseExpr() {}
 		~BaseExpr() {}
 
 		std::string Stringify() override { return "base"; }
-		AstType Type() override { return AstType::BASE_EXPR; }	
+		AstType Type() override { return AstType::BASE_EXPR; }
 	};
 
 	struct ArrayExpr : public Expr
@@ -547,9 +547,11 @@ namespace NajaLang
 	{
 		ClassStmt() {}
 		ClassStmt(IdentifierExpr *name,
+				  std::vector<IdentifierExpr *> publicInherits, std::vector<IdentifierExpr *> protectedInherits, std::vector<IdentifierExpr *> privateInherits,
 				  std::vector<VarStmt *> publicVars, std::vector<VarStmt *> protectedVars, std::vector<VarStmt *> privateVars,
 				  std::vector<FunctionStmt *> publicFunctions, std::vector<FunctionStmt *> protectedFunctions, std::vector<FunctionStmt *> privateFunctions)
-			: publicVars(publicVars), protectedVars(protectedVars), privateVars(privateVars),
+			: publicInherits(publicInherits), protectedInherits(protectedInherits), privateInherits(privateInherits),
+			  publicVars(publicVars), protectedVars(protectedVars), privateVars(privateVars),
 			  publicFunctions(publicFunctions), protectedFunctions(protectedFunctions), privateFunctions(privateFunctions)
 		{
 		}
@@ -558,6 +560,10 @@ namespace NajaLang
 		{
 			delete name;
 			name = nullptr;
+
+			std::vector<IdentifierExpr *>().swap(publicInherits);
+			std::vector<IdentifierExpr *>().swap(protectedInherits);
+			std::vector<IdentifierExpr *>().swap(privateInherits);
 
 			std::vector<VarStmt *>().swap(publicVars);
 			std::vector<VarStmt *>().swap(protectedVars);
@@ -570,7 +576,25 @@ namespace NajaLang
 
 		std::string Stringify() override
 		{
-			std::string result = "class " + name->Stringify() + "\n{\n";
+			std::string result = "class " + name->Stringify();
+
+			if (!publicInherits.empty() || !protectedInherits.empty() || !privateInherits.empty())
+			{
+				result += ":";
+				if (!publicInherits.empty())
+					for (auto pubIn : publicInherits)
+						result += "public " + pubIn->Stringify() + ",\n";
+				if (!protectedInherits.empty())
+					for (auto proIn : protectedInherits)
+						result += "protected " + proIn->Stringify() + ",\n";
+
+				if (!privateInherits.empty())
+					for (auto priIn : privateInherits)
+						result += "private " + priIn->Stringify() + ",\n";
+			
+				result = result.substr(0, result.size() - 2);
+			}
+			result += "\n{\n";
 
 			if (!publicFunctions.empty())
 				for (auto pubFn : publicFunctions)
@@ -610,6 +634,10 @@ namespace NajaLang
 		std::vector<FunctionStmt *> publicFunctions;
 		std::vector<FunctionStmt *> protectedFunctions;
 		std::vector<FunctionStmt *> privateFunctions;
+
+		std::vector<IdentifierExpr *> publicInherits;
+		std::vector<IdentifierExpr *> protectedInherits;
+		std::vector<IdentifierExpr *> privateInherits;
 	};
 
 	struct AstStmts : public Stmt
