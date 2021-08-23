@@ -32,6 +32,7 @@ namespace NajaLang
 		BREAK_STMT,
 		CONTINUE_STMT,
 		FUNCTION_STMT,
+		CLASS_STMT,
 		AST_STMTS,
 	};
 
@@ -151,13 +152,17 @@ namespace NajaLang
 		std::string literal;
 	};
 
-	struct ArrayExpr :public Expr
+	struct ArrayExpr : public Expr
 	{
 		ArrayExpr() {}
-		ArrayExpr(std::vector<Expr*> elements) : elements(elements) {}
-		~ArrayExpr() {}
+		ArrayExpr(std::vector<Expr *> elements) : elements(elements) {}
+		~ArrayExpr()
+		 {
+			 std::vector<Expr *>().swap(elements);
+		 }
 
-		std::string Stringify() override {
+		std::string Stringify() override
+		{
 			std::string result = "[";
 
 			if (!elements.empty())
@@ -171,16 +176,17 @@ namespace NajaLang
 		}
 		AstType Type() override { return AstType::ARRAY_EXPR; }
 
-		std::vector<Expr*> elements;
+		std::vector<Expr *> elements;
 	};
 
-	struct TableExpr :public Expr
+	struct TableExpr : public Expr
 	{
 		TableExpr() {}
-		TableExpr(std::map<Expr*, Expr*> elements) : elements(elements) {}
-		~TableExpr() {}
+		TableExpr(std::map<Expr *, Expr *> elements) : elements(elements) {}
+		~TableExpr(){std::map<Expr *, Expr *>().swap(elements);}
 
-		std::string Stringify() override {
+		std::string Stringify() override
+		{
 			std::string result = "{";
 
 			if (!elements.empty())
@@ -194,13 +200,13 @@ namespace NajaLang
 		}
 		AstType Type() override { return AstType::TABLE_EXPR; }
 
-		std::map<Expr*, Expr*> elements;
+		std::map<Expr *, Expr *> elements;
 	};
 
 	struct PrefixExpr : public Expr
 	{
 		PrefixExpr() : right(nullptr) {}
-		PrefixExpr(std::string op, Expr* right) : op(op), right(right) {}
+		PrefixExpr(std::string op, Expr *right) : op(op), right(right) {}
 		~PrefixExpr()
 		{
 			delete right;
@@ -211,13 +217,13 @@ namespace NajaLang
 		AstType Type() override { return AstType::PREFIX_EXPR; }
 
 		std::string op;
-		Expr* right;
+		Expr *right;
 	};
 
 	struct InfixExpr : public Expr
 	{
 		InfixExpr() : left(nullptr), right(nullptr) {}
-		InfixExpr(std::string op, Expr* left, Expr* right) : op(op), left(left), right(right) {}
+		InfixExpr(std::string op, Expr *left, Expr *right) : op(op), left(left), right(right) {}
 		~InfixExpr()
 		{
 			delete left;
@@ -231,14 +237,14 @@ namespace NajaLang
 		AstType Type() override { return AstType::INFIX_EXPR; }
 
 		std::string op;
-		Expr* left;
-		Expr* right;
+		Expr *left;
+		Expr *right;
 	};
 
 	struct PostfixExpr : public Expr
 	{
 		PostfixExpr() : left(nullptr) {}
-		PostfixExpr(Expr* left, std::string op) : op(op), left(left) {}
+		PostfixExpr(Expr *left, std::string op) : op(op), left(left) {}
 		~PostfixExpr()
 		{
 			delete left;
@@ -248,16 +254,16 @@ namespace NajaLang
 		std::string Stringify() override { return left->Stringify() + op; }
 		AstType Type() override { return AstType::POSTFIX_EXPR; }
 
-		Expr* left;
+		Expr *left;
 		std::string op;
 	};
 
-	struct TernaryExpr :public Expr
+	struct TernaryExpr : public Expr
 	{
-		TernaryExpr() {}
-		TernaryExpr(std::string firstOp, std::string secondOp, Expr* condition, Expr* trueBranch, Expr* falseBranch) :
-			firstOp(firstOp), secondOp(secondOp), condition(condition), trueBranch(trueBranch), falseBranch(falseBranch)
-		{}
+		TernaryExpr():condition(nullptr),trueBranch(nullptr),falseBranch(nullptr) {}
+		TernaryExpr(std::string firstOp, std::string secondOp, Expr *condition, Expr *trueBranch, Expr *falseBranch) : firstOp(firstOp), secondOp(secondOp), condition(condition), trueBranch(trueBranch), falseBranch(falseBranch)
+		{
+		}
 		~TernaryExpr()
 		{
 			delete condition;
@@ -273,9 +279,9 @@ namespace NajaLang
 
 		std::string firstOp;
 		std::string secondOp;
-		Expr* condition;
-		Expr* trueBranch;
-		Expr* falseBranch;
+		Expr *condition;
+		Expr *trueBranch;
+		Expr *falseBranch;
 	};
 
 	struct Stmt : public AstNode
@@ -290,7 +296,7 @@ namespace NajaLang
 	struct ExprStmt : public Stmt
 	{
 		ExprStmt() : expr(nullptr) {}
-		ExprStmt(Expr* expr) : expr(expr) {}
+		ExprStmt(Expr *expr) : expr(expr) {}
 		~ExprStmt()
 		{
 			delete expr;
@@ -300,21 +306,21 @@ namespace NajaLang
 		std::string Stringify() override { return expr->Stringify() + ";"; }
 		AstType Type() override { return AstType::EXPR_STMT; }
 
-		Expr* expr;
+		Expr *expr;
 	};
 
 	struct VarStmt : public Stmt
 	{
 		VarStmt() {}
-		VarStmt(std::unordered_map<IdentifierExpr*, Expr*> variables) : variables(variables) {}
-		~VarStmt() {}
+		VarStmt(std::unordered_map<IdentifierExpr *, Expr *> variables) : variables(variables) {}
+		~VarStmt() {std::unordered_map<IdentifierExpr*,Expr*>().swap(variables);}
 
 		std::string Stringify() override
 		{
 			std::string result = "var ";
 			if (!variables.empty())
 			{
-				for (const auto& variable : variables)
+				for (const auto &variable : variables)
 					result += variable.first->Stringify() + "=" + variable.second->Stringify() + ",";
 				result = result.substr(0, result.size() - 1);
 			}
@@ -323,13 +329,13 @@ namespace NajaLang
 		}
 		AstType Type() override { return AstType::VAR_STMT; }
 
-		std::unordered_map<IdentifierExpr*, Expr*> variables;
+		std::unordered_map<IdentifierExpr *, Expr *> variables;
 	};
 
 	struct ReturnStmt : public Stmt
 	{
 		ReturnStmt() : expr(nullptr) {}
-		ReturnStmt(Expr* expr) : expr(expr) {}
+		ReturnStmt(Expr *expr) : expr(expr) {}
 		~ReturnStmt()
 		{
 			delete expr;
@@ -339,16 +345,16 @@ namespace NajaLang
 		std::string Stringify() override { return "return " + expr->Stringify() + ";"; }
 		AstType Type() override { return AstType::RETURN_STMT; }
 
-		Expr* expr;
+		Expr *expr;
 	};
 
 	struct IfStmt : public Stmt
 	{
 		IfStmt() : condition(nullptr), thenBranch(nullptr), elseBranch(nullptr) {}
-		IfStmt(Expr* condition, Stmt* thenBranch, Stmt* elseBranch)
+		IfStmt(Expr *condition, Stmt *thenBranch, Stmt *elseBranch)
 			: condition(condition),
-			thenBranch(thenBranch),
-			elseBranch(elseBranch)
+			  thenBranch(thenBranch),
+			  elseBranch(elseBranch)
 		{
 		}
 		~IfStmt()
@@ -371,35 +377,40 @@ namespace NajaLang
 		}
 		AstType Type() override { return AstType::IF_STMT; }
 
-		Expr* condition;
-		Stmt* thenBranch;
-		Stmt* elseBranch;
+		Expr *condition;
+		Stmt *thenBranch;
+		Stmt *elseBranch;
 	};
 
 	struct ScopeStmt : public Stmt
 	{
 		ScopeStmt() {}
-		ScopeStmt(std::vector<Stmt*> stmts) : stmts(stmts) {}
-		~ScopeStmt() { std::vector<Stmt*>().swap(stmts); }
+		ScopeStmt(std::vector<Stmt *> stmts) : stmts(stmts) {}
+		~ScopeStmt() { std::vector<Stmt *>().swap(stmts); }
 
 		std::string Stringify() override
 		{
 			std::string result = "{";
-			for (const auto& stmt : stmts)
+			for (const auto &stmt : stmts)
 				result += stmt->Stringify();
 			result += "}";
 			return result;
 		}
 
 		AstType Type() override { return AstType::SCOPE_STMT; }
-		std::vector<Stmt*> stmts;
+		std::vector<Stmt *> stmts;
 	};
 
 	struct FunctionExpr : public Expr
 	{
-		FunctionExpr() {}
-		FunctionExpr(std::vector<IdentifierExpr*> parameters, ScopeStmt* body) : parameters(parameters), body(body) {}
-		~FunctionExpr() {}
+		FunctionExpr():body(nullptr) {}
+		FunctionExpr(std::vector<IdentifierExpr *> parameters, ScopeStmt *body) : parameters(parameters), body(body) {}
+		~FunctionExpr() 
+		{
+			std::vector<IdentifierExpr *>().swap(parameters);
+			delete body;
+			body=nullptr;
+		}
 
 		std::string Stringify() override
 		{
@@ -416,16 +427,16 @@ namespace NajaLang
 		}
 		AstType Type() override { return AstType::FUNCTION_EXPR; }
 
-		std::vector<IdentifierExpr*> parameters;
-		ScopeStmt* body;
+		std::vector<IdentifierExpr *> parameters;
+		ScopeStmt *body;
 	};
 
 	struct WhileStmt : public Stmt
 	{
 		WhileStmt() : condition(nullptr), stmt(nullptr) {}
-		WhileStmt(Expr* condition, Stmt* stmt)
+		WhileStmt(Expr *condition, Stmt *stmt)
 			: condition(condition),
-			stmt(stmt)
+			  stmt(stmt)
 		{
 		}
 		~WhileStmt()
@@ -442,8 +453,8 @@ namespace NajaLang
 		}
 		AstType Type() override { return AstType::WHILE_STMT; }
 
-		Expr* condition;
-		Stmt* stmt;
+		Expr *condition;
+		Stmt *stmt;
 	};
 
 	struct BreakStmt : public Stmt
@@ -466,9 +477,18 @@ namespace NajaLang
 
 	struct FunctionStmt : public Stmt
 	{
-		FunctionStmt() {}
-		FunctionStmt(IdentifierExpr* name, std::vector<IdentifierExpr*> parameters, ScopeStmt* body) : name(name), parameters(parameters), body(body) {}
-		~FunctionStmt() {}
+		FunctionStmt():name(nullptr),body(nullptr) {}
+		FunctionStmt(IdentifierExpr *name, std::vector<IdentifierExpr *> parameters, ScopeStmt *body) : name(name), parameters(parameters), body(body) {}
+		~FunctionStmt()
+		 {
+			 delete name;
+			 name=nullptr;
+
+			 std::vector<IdentifierExpr *>().swap(parameters);
+
+			 delete body;
+			 body=nullptr;
+		 }
 
 		std::string Stringify() override
 		{
@@ -485,26 +505,56 @@ namespace NajaLang
 		}
 		AstType Type() override { return AstType::FUNCTION_STMT; }
 
-		IdentifierExpr* name;
-		std::vector<IdentifierExpr*> parameters;
-		ScopeStmt* body;
+		IdentifierExpr *name;
+		std::vector<IdentifierExpr *> parameters;
+		ScopeStmt *body;
+	};
+
+	struct ClassStmt : public Stmt
+	{
+		ClassStmt() {}
+		ClassStmt(std::vector<VarStmt *> publicVars, std::vector<VarStmt *> protectedVars, std::vector<VarStmt *> privateVars,
+				  std::vector<FunctionStmt *> publicFunctions, std::vector<FunctionStmt *> protectedFunctions, std::vector<FunctionStmt *> privateFunctions)
+			: publicVars(publicVars), protectedVars(protectedVars), privateVars(privateVars),
+			  publicFunctions(publicFunctions), protectedFunctions(protectedFunctions), privateFunctions(privateFunctions)
+		{
+		}
+
+		~ClassStmt()
+		{
+			std::vector<VarStmt *>().swap(publicVars);
+			std::vector<VarStmt *>().swap(protectedVars);
+			std::vector<VarStmt *>().swap(privateVars);
+
+			std::vector<FunctionStmt *>().swap(publicFunctions);
+			std::vector<FunctionStmt *>().swap(protectedFunctions);
+			std::vector<FunctionStmt *>().swap(privateFunctions);
+		}
+
+		std::vector<VarStmt *> publicVars;
+		std::vector<VarStmt *> protectedVars;
+		std::vector<VarStmt *> privateVars;
+
+		std::vector<FunctionStmt *> publicFunctions;
+		std::vector<FunctionStmt *> protectedFunctions;
+		std::vector<FunctionStmt *> privateFunctions;
 	};
 
 	struct AstStmts : public Stmt
 	{
 		AstStmts() {}
-		AstStmts(std::vector<Stmt*> stmts) : stmts(stmts) {}
-		~AstStmts() { std::vector<Stmt*>().swap(stmts); }
+		AstStmts(std::vector<Stmt *> stmts) : stmts(stmts) {}
+		~AstStmts() { std::vector<Stmt *>().swap(stmts); }
 
 		std::string Stringify() override
 		{
 			std::string result;
-			for (const auto& stmt : stmts)
+			for (const auto &stmt : stmts)
 				result += stmt->Stringify();
 			return result;
 		}
 		AstType Type() override { return AstType::AST_STMTS; }
 
-		std::vector<Stmt*> stmts;
+		std::vector<Stmt *> stmts;
 	};
 }
