@@ -24,7 +24,7 @@ namespace NajaLang
 		MUL_DIV_MOD, // * / %
 
 		// PREFIX,		 // ++ -- ! ~ &
-		POSTFIX,	 // ++ --
+		POSTFIX,	 // ++ -- () [] .
 	};
 
 	class Parser;
@@ -75,6 +75,7 @@ namespace NajaLang
 		Expr *ParseInfixExpr(Expr *prefixExpr);
 		Expr *ParsePostfixExpr(Expr *prefixExpr);
 		Expr* ParseTernaryExpr(Expr* prefixExpr);
+		Expr* ParseIndexExpr(Expr* prefixExpr);
 
 		Token GetCurToken();
 		Token GetCurTokenAndStepOnce();

@@ -52,5 +52,8 @@
         "xhash": "cpp",
         "map": "cpp",
         "xtree": "cpp"
+    },
+    {
+        "editor.formatOnSave": true
     }
 }

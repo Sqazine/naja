@@ -25,6 +25,7 @@ namespace NajaLang
 		INFIX_EXPR,
 		POSTFIX_EXPR,
 		TERNARY_EXPR,
+		INDEX_EXPR,
 
 		VAR_STMT,
 		EXPR_STMT,
@@ -38,30 +39,6 @@ namespace NajaLang
 		CLASS_STMT,
 		AST_STMTS,
 	};
-
-	struct AstNode;
-	struct Expr;
-	struct FloatNumExpr;
-	struct IntNumExpr;
-	struct StrNumExpr;
-	struct NullNumExpr;
-	struct TrueNumExpr;
-	struct FalseNumExpr;
-	struct IdentifierNumExpr;
-	struct FunctionNumExpr;
-	struct PrefixNumExpr;
-	struct InfixNumExpr;
-	struct PostfixNumExpr;
-	struct Stmt;
-	struct VarStmt;
-	struct ExprStmt;
-	struct ReturnStmt;
-	struct IfStmt;
-	struct ScopeStmt;
-	struct WhileStmt;
-	struct BreakStmt;
-	struct ContinueStmt;
-	struct AstStmts;
 
 	struct AstNode
 	{
@@ -315,6 +292,25 @@ namespace NajaLang
 		Expr *condition;
 		Expr *trueBranch;
 		Expr *falseBranch;
+	};
+
+	struct IndexExpr:public Expr
+	{
+		IndexExpr(){}
+		IndexExpr(Expr* array,Expr* index):array(array),index(index){}
+		~IndexExpr()
+		{
+			delete array;
+			array=nullptr;
+			delete index;
+			index=nullptr;
+		}
+		std::string Stringify() override { return array->Stringify() + "[" + index->Stringify() +"]"; }
+		
+		AstType Type() override { return AstType::INDEX_EXPR; }
+
+		Expr* array;
+		Expr* index;
 	};
 
 	struct Stmt : public AstNode

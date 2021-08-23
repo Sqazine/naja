@@ -71,12 +71,14 @@ namespace NajaLang
 			{TOKEN_ASTERISK, &Parser::ParseInfixExpr},
 			{TOKEN_SLASH, &Parser::ParseInfixExpr},
 			{TOKEN_PERCENT, &Parser::ParseInfixExpr},
+
 	};
 
 	std::unordered_map<TokenType, PostfixFn> Parser::m_PostfixFunctions = {
 
 		{TOKEN_PLUS_PLUS, &Parser::ParsePostfixExpr},
 		{TOKEN_MINUS_MINUS, &Parser::ParsePostfixExpr},
+		{TOKEN_LEFT_BRACKET, &Parser::ParseIndexExpr},
 	};
 
 	std::unordered_map<TokenType, Precedence> Parser::m_Precedence = {
@@ -125,6 +127,9 @@ namespace NajaLang
 
 		{TOKEN_PLUS_PLUS, POSTFIX},
 		{TOKEN_MINUS_MINUS, POSTFIX},
+
+		{TOKEN_LEFT_BRACKET, POSTFIX},
+		{TOKEN_LEFT_PAREN, POSTFIX},
 	};
 
 	Parser::Parser()
@@ -665,6 +670,16 @@ namespace NajaLang
 		ternaryExpr->secondOp = Consume(TOKEN_COLON, "Expect ':'").literal;
 		ternaryExpr->falseBranch = ParseExpr();
 		return ternaryExpr;
+	}
+
+	Expr *Parser::ParseIndexExpr(Expr *prefixExpr)
+	{
+		Consume(TOKEN_LEFT_BRACKET, "Expect '['.");
+		auto indexExpr = new IndexExpr();
+		indexExpr->array = prefixExpr;
+		indexExpr->index = ParseExpr();
+		Consume(TOKEN_RIGHT_BRACKET, "Expect ']'.");
+		return indexExpr;
 	}
 
 	Token Parser::GetCurToken()
