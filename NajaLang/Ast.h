@@ -526,7 +526,8 @@ namespace NajaLang
 	struct ClassStmt : public Stmt
 	{
 		ClassStmt() {}
-		ClassStmt(std::vector<VarStmt *> publicVars, std::vector<VarStmt *> protectedVars, std::vector<VarStmt *> privateVars,
+		ClassStmt(IdentifierExpr *name,
+				  std::vector<VarStmt *> publicVars, std::vector<VarStmt *> protectedVars, std::vector<VarStmt *> privateVars,
 				  std::vector<FunctionStmt *> publicFunctions, std::vector<FunctionStmt *> protectedFunctions, std::vector<FunctionStmt *> privateFunctions)
 			: publicVars(publicVars), protectedVars(protectedVars), privateVars(privateVars),
 			  publicFunctions(publicFunctions), protectedFunctions(protectedFunctions), privateFunctions(privateFunctions)
@@ -535,6 +536,9 @@ namespace NajaLang
 
 		~ClassStmt()
 		{
+			delete name;
+			name = nullptr;
+
 			std::vector<VarStmt *>().swap(publicVars);
 			std::vector<VarStmt *>().swap(protectedVars);
 			std::vector<VarStmt *>().swap(privateVars);
@@ -543,6 +547,41 @@ namespace NajaLang
 			std::vector<FunctionStmt *>().swap(protectedFunctions);
 			std::vector<FunctionStmt *>().swap(privateFunctions);
 		}
+
+		std::string Stringify() override
+		{
+			std::string result = "class " + name->Stringify() + "\n{\n";
+
+			if (!publicFunctions.empty())
+				for (auto pubFn : publicFunctions)
+					result += "\tpublic " + pubFn->Stringify() + "\n";
+
+			if (!protectedFunctions.empty())
+				for (auto proFn : protectedFunctions)
+					result += "\tprotected " + proFn->Stringify() + "\n";
+
+			if (!privateFunctions.empty())
+				for (auto priFn : privateFunctions)
+					result += "\tprivate " + priFn->Stringify() + "\n";
+
+			if (!publicVars.empty())
+				for (auto pubVar : publicVars)
+					result += "\tpublic " + pubVar->Stringify() + "\n";
+
+			if (!protectedVars.empty())
+				for (auto proVar : protectedVars)
+					result += "\tprotected " + proVar->Stringify() + "\n";
+
+			if (!privateVars.empty())
+				for (auto priVar : privateVars)
+					result += "private " + priVar->Stringify() + "\n";
+
+			result += "}\n";
+			return result;
+		}
+		AstType Type() override { return AstType::CLASS_STMT; }
+
+		IdentifierExpr *name;
 
 		std::vector<VarStmt *> publicVars;
 		std::vector<VarStmt *> protectedVars;

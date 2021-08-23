@@ -3,70 +3,70 @@
 namespace NajaLang
 {
 
-	static NullExpr* nullExpr = new NullExpr();
-	static TrueExpr* trueExpr = new TrueExpr();
-	static FalseExpr* falseExpr = new FalseExpr();
+	static NullExpr *nullExpr = new NullExpr();
+	static TrueExpr *trueExpr = new TrueExpr();
+	static FalseExpr *falseExpr = new FalseExpr();
 
 	std::unordered_map<TokenType, PrefixFn> Parser::m_PrefixFunctions =
-	{
-		{TOKEN_IDENTIFIER, &Parser::ParseIdentifierExpr},
-		{TOKEN_NUMBER, &Parser::ParseNumExpr},
-		{TOKEN_STRING, &Parser::ParseStrExpr},
-		{TOKEN_NULL, &Parser::ParseNullExpr},
-		{TOKEN_TRUE, &Parser::ParseTrueExpr},
-		{TOKEN_FALSE, &Parser::ParseFalseExpr},
-		{TOKEN_MINUS, &Parser::ParsePrefixExpr},
-		{TOKEN_BANG, &Parser::ParsePrefixExpr},
-		{TOKEN_TILDE, &Parser::ParsePrefixExpr},
-		{TOKEN_AMPERSAND, &Parser::ParsePrefixExpr},
-		{TOKEN_PLUS_PLUS, &Parser::ParsePrefixExpr},
-		{TOKEN_MINUS_MINUS, &Parser::ParsePrefixExpr},
-		{TOKEN_LEFT_PAREN,&Parser::ParseGroupExpr},
-		{TOKEN_FUNCTION, &Parser::ParseFunctionExpr},
-		{TOKEN_LEFT_BRACKET,&Parser::ParseArrayExpr},
-		{TOKEN_LEFT_BRACE,&Parser::ParseTableExpr},
+		{
+			{TOKEN_IDENTIFIER, &Parser::ParseIdentifierExpr},
+			{TOKEN_NUMBER, &Parser::ParseNumExpr},
+			{TOKEN_STRING, &Parser::ParseStrExpr},
+			{TOKEN_NULL, &Parser::ParseNullExpr},
+			{TOKEN_TRUE, &Parser::ParseTrueExpr},
+			{TOKEN_FALSE, &Parser::ParseFalseExpr},
+			{TOKEN_MINUS, &Parser::ParsePrefixExpr},
+			{TOKEN_BANG, &Parser::ParsePrefixExpr},
+			{TOKEN_TILDE, &Parser::ParsePrefixExpr},
+			{TOKEN_AMPERSAND, &Parser::ParsePrefixExpr},
+			{TOKEN_PLUS_PLUS, &Parser::ParsePrefixExpr},
+			{TOKEN_MINUS_MINUS, &Parser::ParsePrefixExpr},
+			{TOKEN_LEFT_PAREN, &Parser::ParseGroupExpr},
+			{TOKEN_FUNCTION, &Parser::ParseFunctionExpr},
+			{TOKEN_LEFT_BRACKET, &Parser::ParseArrayExpr},
+			{TOKEN_LEFT_BRACE, &Parser::ParseTableExpr},
 
 	};
 
 	std::unordered_map<TokenType, InfixFn> Parser::m_InfixFunctions =
-	{
-		{TOKEN_EQUAL, &Parser::ParseInfixExpr},
-		{TOKEN_PLUS_EQUAL, &Parser::ParseInfixExpr},
-		{TOKEN_MINUS_EQUAL, &Parser::ParseInfixExpr},
-		{TOKEN_ASTERISK_EQUAL, &Parser::ParseInfixExpr},
-		{TOKEN_SLASH_EQUAL, &Parser::ParseInfixExpr},
-		{TOKEN_PERCENT_EQUAL, &Parser::ParseInfixExpr},
-		{TOKEN_AMPERSAND_EQUAL, &Parser::ParseInfixExpr},
-		{TOKEN_CARET_EQUAL, &Parser::ParseInfixExpr},
-		{TOKEN_VBAR_EQUAL, &Parser::ParseInfixExpr},
-		{TOKEN_LESS_LESS_EQUAL, &Parser::ParseInfixExpr},
-		{TOKEN_GREATER_GREATER_EQUAL, &Parser::ParseInfixExpr},
+		{
+			{TOKEN_EQUAL, &Parser::ParseInfixExpr},
+			{TOKEN_PLUS_EQUAL, &Parser::ParseInfixExpr},
+			{TOKEN_MINUS_EQUAL, &Parser::ParseInfixExpr},
+			{TOKEN_ASTERISK_EQUAL, &Parser::ParseInfixExpr},
+			{TOKEN_SLASH_EQUAL, &Parser::ParseInfixExpr},
+			{TOKEN_PERCENT_EQUAL, &Parser::ParseInfixExpr},
+			{TOKEN_AMPERSAND_EQUAL, &Parser::ParseInfixExpr},
+			{TOKEN_CARET_EQUAL, &Parser::ParseInfixExpr},
+			{TOKEN_VBAR_EQUAL, &Parser::ParseInfixExpr},
+			{TOKEN_LESS_LESS_EQUAL, &Parser::ParseInfixExpr},
+			{TOKEN_GREATER_GREATER_EQUAL, &Parser::ParseInfixExpr},
 
-		{TOKEN_QUESTION, &Parser::ParseTernaryExpr},
+			{TOKEN_QUESTION, &Parser::ParseTernaryExpr},
 
-		{TOKEN_VBAR_VBAR, &Parser::ParseInfixExpr},
-		{TOKEN_AMPERSAND_AMPERSAND, &Parser::ParseInfixExpr},
+			{TOKEN_VBAR_VBAR, &Parser::ParseInfixExpr},
+			{TOKEN_AMPERSAND_AMPERSAND, &Parser::ParseInfixExpr},
 
-		{TOKEN_VBAR, &Parser::ParseInfixExpr},
-		{TOKEN_CARET, &Parser::ParseInfixExpr},
-		{TOKEN_AMPERSAND, &Parser::ParseInfixExpr},
+			{TOKEN_VBAR, &Parser::ParseInfixExpr},
+			{TOKEN_CARET, &Parser::ParseInfixExpr},
+			{TOKEN_AMPERSAND, &Parser::ParseInfixExpr},
 
-		{TOKEN_EQUAL_EQUAL, &Parser::ParseInfixExpr},
-		{TOKEN_BANG_EQUAL, &Parser::ParseInfixExpr},
+			{TOKEN_EQUAL_EQUAL, &Parser::ParseInfixExpr},
+			{TOKEN_BANG_EQUAL, &Parser::ParseInfixExpr},
 
-		{TOKEN_LESS, &Parser::ParseInfixExpr},
-		{TOKEN_LESS_EQUAL, &Parser::ParseInfixExpr},
-		{TOKEN_GREATER, &Parser::ParseInfixExpr},
-		{TOKEN_GREATER_EQUAL, &Parser::ParseInfixExpr},
+			{TOKEN_LESS, &Parser::ParseInfixExpr},
+			{TOKEN_LESS_EQUAL, &Parser::ParseInfixExpr},
+			{TOKEN_GREATER, &Parser::ParseInfixExpr},
+			{TOKEN_GREATER_EQUAL, &Parser::ParseInfixExpr},
 
-		{TOKEN_LESS_LESS, &Parser::ParseInfixExpr},
-		{TOKEN_GREATER_GREATER, &Parser::ParseInfixExpr},
+			{TOKEN_LESS_LESS, &Parser::ParseInfixExpr},
+			{TOKEN_GREATER_GREATER, &Parser::ParseInfixExpr},
 
-		{TOKEN_PLUS, &Parser::ParseInfixExpr},
-		{TOKEN_MINUS, &Parser::ParseInfixExpr},
-		{TOKEN_ASTERISK, &Parser::ParseInfixExpr},
-		{TOKEN_SLASH, &Parser::ParseInfixExpr},
-		{TOKEN_PERCENT, &Parser::ParseInfixExpr},
+			{TOKEN_PLUS, &Parser::ParseInfixExpr},
+			{TOKEN_MINUS, &Parser::ParseInfixExpr},
+			{TOKEN_ASTERISK, &Parser::ParseInfixExpr},
+			{TOKEN_SLASH, &Parser::ParseInfixExpr},
+			{TOKEN_PERCENT, &Parser::ParseInfixExpr},
 	};
 
 	std::unordered_map<TokenType, PostfixFn> Parser::m_PostfixFunctions = {
@@ -131,7 +131,7 @@ namespace NajaLang
 	{
 	}
 
-	Stmt* Parser::Parse(const std::vector<Token>& tokens)
+	Stmt *Parser::Parse(const std::vector<Token> &tokens)
 	{
 		ResetStatus();
 		m_Tokens = tokens;
@@ -152,14 +152,14 @@ namespace NajaLang
 		m_Stmts = new AstStmts();
 	}
 
-	Stmt* Parser::ParseAstStmts()
+	Stmt *Parser::ParseAstStmts()
 	{
 		while (!IsMatchCurToken(TOKEN_EOF))
 			m_Stmts->stmts.emplace_back(ParseStmt());
 		return m_Stmts;
 	}
 
-	Stmt* Parser::ParseStmt()
+	Stmt *Parser::ParseStmt()
 	{
 		if (IsMatchCurToken(TOKEN_VAR))
 			return ParseVarStmt();
@@ -179,25 +179,27 @@ namespace NajaLang
 			return ParseContinueStmt();
 		else if (IsMatchCurToken(TOKEN_FUNCTION))
 			return ParseFunctionStmt();
+		else if (IsMatchCurToken(TOKEN_CLASS))
+			return ParseClassStmt();
 		else
 			return ParseExprStmt();
 	}
 
-	Stmt* Parser::ParseExprStmt()
+	Stmt *Parser::ParseExprStmt()
 	{
 		auto exprStmt = new ExprStmt(ParseExpr());
 		Consume(TOKEN_SEMICOLON, "Expect ';' after expr stmt.");
 		return exprStmt;
 	}
 
-	Stmt* Parser::ParseVarStmt()
+	Stmt *Parser::ParseVarStmt()
 	{
 		Consume(TOKEN_VAR, "Expect 'var' key word");
 		auto varStmt = new VarStmt();
 
 		//the first variable
 		auto identifier = new IdentifierExpr(Consume(TOKEN_IDENTIFIER, "Expect valid identifier").literal);
-		Expr* value = nullExpr;
+		Expr *value = nullExpr;
 		if (IsMatchCurTokenAndStepOnce(TOKEN_EQUAL))
 			value = ParseExpr();
 		varStmt->variables[identifier] = value;
@@ -206,7 +208,7 @@ namespace NajaLang
 		while (IsMatchCurTokenAndStepOnce(TOKEN_COMMA))
 		{
 			identifier = new IdentifierExpr(Consume(TOKEN_IDENTIFIER, "Expect valid identifier").literal);
-			Expr* value = nullExpr;
+			Expr *value = nullExpr;
 			if (IsMatchCurTokenAndStepOnce(TOKEN_EQUAL))
 				value = ParseExpr();
 			varStmt->variables[identifier] = value;
@@ -217,7 +219,7 @@ namespace NajaLang
 		return varStmt;
 	}
 
-	Stmt* Parser::ParseReturnStmt()
+	Stmt *Parser::ParseReturnStmt()
 	{
 		Consume(TOKEN_RETURN, "Expect 'return' key word.");
 		auto returnStmt = new ReturnStmt(ParseExpr());
@@ -225,7 +227,7 @@ namespace NajaLang
 		return returnStmt;
 	}
 
-	Stmt* Parser::ParseIfStmt()
+	Stmt *Parser::ParseIfStmt()
 	{
 		Consume(TOKEN_IF, "Expect 'if' key word.");
 		Consume(TOKEN_LEFT_PAREN, "Expect '(' after 'if'.");
@@ -244,7 +246,7 @@ namespace NajaLang
 		return ifStmt;
 	}
 
-	Stmt* Parser::ParseScopeStmt()
+	Stmt *Parser::ParseScopeStmt()
 	{
 		Consume(TOKEN_LEFT_BRACE, "Expect '{'.");
 		auto scopeStmt = new ScopeStmt();
@@ -254,7 +256,7 @@ namespace NajaLang
 		return scopeStmt;
 	}
 
-	Stmt* Parser::ParseWhileStmt()
+	Stmt *Parser::ParseWhileStmt()
 	{
 		Consume(TOKEN_WHILE, "Expect 'while' keyword.");
 		Consume(TOKEN_LEFT_PAREN, "Expect '(' after 'while'.");
@@ -270,7 +272,7 @@ namespace NajaLang
 		return whileStmt;
 	}
 
-	Stmt* Parser::ParseForStmt()
+	Stmt *Parser::ParseForStmt()
 	{
 		//for(i=0;j=0;i<10&&j<20;++i,++j)
 		//{
@@ -312,7 +314,7 @@ namespace NajaLang
 
 		Consume(TOKEN_SEMICOLON, "Expect ';' after 'for' stmt condition part.");
 
-		std::vector<ExprStmt*> independentVariables;
+		std::vector<ExprStmt *> independentVariables;
 		if (!IsMatchCurToken(TOKEN_RIGHT_PAREN))
 		{
 			independentVariables.emplace_back(new ExprStmt(ParseExpr()));
@@ -330,7 +332,7 @@ namespace NajaLang
 		else //for loop body is a expr stmt
 			loopBody->stmts.emplace_back(ParseExprStmt());
 
-		for (auto& independentVariable : independentVariables)
+		for (auto &independentVariable : independentVariables)
 			loopBody->stmts.emplace_back(independentVariable);
 
 		auto whileStmt = new WhileStmt(forCondition, loopBody);
@@ -340,7 +342,7 @@ namespace NajaLang
 		return forStmt;
 	}
 
-	Stmt* Parser::ParseBreakStmt()
+	Stmt *Parser::ParseBreakStmt()
 	{
 		Consume(TOKEN_BREAK, "Expect 'break' keyword.");
 		auto breakStmt = new BreakStmt();
@@ -348,7 +350,7 @@ namespace NajaLang
 		return breakStmt;
 	}
 
-	Stmt* Parser::ParseContinueStmt()
+	Stmt *Parser::ParseContinueStmt()
 	{
 		Consume(TOKEN_CONTINUE, "Expect 'continue' keyword.");
 		auto continueStmt = new ContinueStmt();
@@ -356,34 +358,81 @@ namespace NajaLang
 		return continueStmt;
 	}
 
-	Stmt* Parser::ParseFunctionStmt()
+	Stmt *Parser::ParseFunctionStmt()
 	{
 		Consume(TOKEN_FUNCTION, "Expect 'function' keyword");
 
 		auto funcStmt = new FunctionStmt();
 
-		funcStmt->name = (IdentifierExpr*)ParseIdentifierExpr();
+		funcStmt->name = (IdentifierExpr *)ParseIdentifierExpr();
 
 		Consume(TOKEN_LEFT_PAREN, "Expect '(' after function name.");
 
 		if (!IsMatchCurToken(TOKEN_RIGHT_PAREN)) //has parameter
 		{
-			IdentifierExpr* idenExpr = (IdentifierExpr*)ParseIdentifierExpr();
+			IdentifierExpr *idenExpr = (IdentifierExpr *)ParseIdentifierExpr();
 			funcStmt->parameters.emplace_back(idenExpr);
 			while (IsMatchCurTokenAndStepOnce(TOKEN_COMMA))
 			{
-				idenExpr = (IdentifierExpr*)ParseIdentifierExpr();
+				idenExpr = (IdentifierExpr *)ParseIdentifierExpr();
 				funcStmt->parameters.emplace_back(idenExpr);
 			}
 		}
 		Consume(TOKEN_RIGHT_PAREN, "Expect ')' after function expr's '('");
 
-		funcStmt->body = (ScopeStmt*)ParseScopeStmt();
+		funcStmt->body = (ScopeStmt *)ParseScopeStmt();
 
 		return funcStmt;
 	}
 
-	Expr* Parser::ParseExpr(Precedence precedence)
+	Stmt *Parser::ParseClassStmt()
+	{
+		Consume(TOKEN_CLASS, "Expect 'class' keyword");
+		auto classStmt = new ClassStmt();
+		classStmt->name = (IdentifierExpr *)ParseIdentifierExpr();
+
+		Consume(TOKEN_LEFT_BRACE, "Expect '{' after class name.");
+
+		while (!IsMatchCurToken(TOKEN_RIGHT_BRACE))
+		{
+			if (IsMatchCurTokenAndStepOnce(TOKEN_PUBLIC)) //public function or variable
+			{
+
+				if (IsMatchCurToken(TOKEN_FUNCTION))
+					classStmt->publicFunctions.emplace_back((FunctionStmt*)ParseFunctionStmt());
+				else if (IsMatchCurToken(TOKEN_VAR))
+					classStmt->publicVars.emplace_back((VarStmt*)ParseVarStmt());
+				else
+					Consume({TOKEN_FUNCTION, TOKEN_VAR}, "Expect 'function' or 'var' after 'public' keyword.");
+			}
+			else if (IsMatchCurTokenAndStepOnce(TOKEN_PROTECTED)) //protected function or variable
+			{
+				if (IsMatchCurToken(TOKEN_FUNCTION))
+					classStmt->protectedFunctions.emplace_back((FunctionStmt*)ParseFunctionStmt());
+				else if (IsMatchCurTokenAndStepOnce(TOKEN_VAR))
+					classStmt->protectedVars.emplace_back((VarStmt*)ParseVarStmt());
+				else
+					Consume({TOKEN_FUNCTION, TOKEN_VAR}, "Expect 'function' or 'var' after 'protected' keyword.");
+			}
+			else //private function or variable,'private' keyword is not the necessary
+			{
+				if(IsMatchCurToken(TOKEN_PRIVATE))
+					GetCurTokenAndStepOnce();
+				if (IsMatchCurTokenAndStepOnce(TOKEN_FUNCTION))
+					classStmt->privateFunctions.emplace_back((FunctionStmt*)ParseFunctionStmt());
+				else if (IsMatchCurTokenAndStepOnce(TOKEN_VAR))
+					classStmt->privateVars.emplace_back((VarStmt*)ParseVarStmt());
+				else
+					Consume({TOKEN_FUNCTION, TOKEN_VAR}, "only function or variable declaration is available in class scope.");
+			}
+		}
+
+		Consume(TOKEN_RIGHT_BRACE, "Expect '}' after class name.");
+
+		return classStmt;
+	}
+
+	Expr *Parser::ParseExpr(Precedence precedence)
 	{
 		if (m_PrefixFunctions.find(GetCurToken().type) == m_PrefixFunctions.end())
 		{
@@ -419,12 +468,12 @@ namespace NajaLang
 		return leftExpr;
 	}
 
-	Expr* Parser::ParseIdentifierExpr()
+	Expr *Parser::ParseIdentifierExpr()
 	{
 		return new IdentifierExpr(Consume(TOKEN_IDENTIFIER, "Expect a identifier.").literal);
 	}
 
-	Expr* Parser::ParseNumExpr()
+	Expr *Parser::ParseNumExpr()
 	{
 		std::string numLiteral = Consume(TOKEN_NUMBER, "Expexct a number literal.").literal;
 
@@ -434,37 +483,37 @@ namespace NajaLang
 			return new IntNumExpr(std::stoll(numLiteral));
 	}
 
-	Expr* Parser::ParseStrExpr()
+	Expr *Parser::ParseStrExpr()
 	{
 		return new StrExpr(Consume(TOKEN_STRING, "Expect a string literal.").literal);
 	}
 
-	Expr* Parser::ParseNullExpr()
+	Expr *Parser::ParseNullExpr()
 	{
 		Consume(TOKEN_NULL, "Expect 'null' keyword");
 		return nullExpr;
 	}
-	Expr* Parser::ParseTrueExpr()
+	Expr *Parser::ParseTrueExpr()
 	{
 		Consume(TOKEN_TRUE, "Expect 'true' keyword");
 		return trueExpr;
 	}
-	Expr* Parser::ParseFalseExpr()
+	Expr *Parser::ParseFalseExpr()
 	{
 		Consume(TOKEN_FALSE, "Expect 'false' keyword");
 		return falseExpr;
 	}
 
-		Expr* Parser::ParseGroupExpr()
-		{
-			Consume(TOKEN_LEFT_PAREN,"Expect '('.");
-			auto groupExpr=new GroupExpr();
-			groupExpr->expr=ParseExpr();
-			Consume(TOKEN_RIGHT_PAREN,"Expect ')'.");
-			return groupExpr;
-		}
+	Expr *Parser::ParseGroupExpr()
+	{
+		Consume(TOKEN_LEFT_PAREN, "Expect '('.");
+		auto groupExpr = new GroupExpr();
+		groupExpr->expr = ParseExpr();
+		Consume(TOKEN_RIGHT_PAREN, "Expect ')'.");
+		return groupExpr;
+	}
 
-	Expr* Parser::ParseFunctionExpr()
+	Expr *Parser::ParseFunctionExpr()
 	{
 		Consume(TOKEN_FUNCTION, "Expect 'function' keyword");
 		Consume(TOKEN_LEFT_PAREN, "Expect '(' after 'function' keyword");
@@ -472,22 +521,22 @@ namespace NajaLang
 
 		if (!IsMatchCurToken(TOKEN_RIGHT_PAREN)) //has parameter
 		{
-			IdentifierExpr* idenExpr = (IdentifierExpr*)ParseIdentifierExpr();
+			IdentifierExpr *idenExpr = (IdentifierExpr *)ParseIdentifierExpr();
 			funcExpr->parameters.emplace_back(idenExpr);
 			while (IsMatchCurTokenAndStepOnce(TOKEN_COMMA))
 			{
-				idenExpr = (IdentifierExpr*)ParseIdentifierExpr();
+				idenExpr = (IdentifierExpr *)ParseIdentifierExpr();
 				funcExpr->parameters.emplace_back(idenExpr);
 			}
 		}
 		Consume(TOKEN_RIGHT_PAREN, "Expect ')' after function expr's '('");
 
-		funcExpr->body = (ScopeStmt*)ParseScopeStmt();
+		funcExpr->body = (ScopeStmt *)ParseScopeStmt();
 
 		return funcExpr;
 	}
 
-	Expr* Parser::ParseArrayExpr()
+	Expr *Parser::ParseArrayExpr()
 	{
 		Consume(TOKEN_LEFT_BRACKET, "Expect '['.");
 
@@ -505,7 +554,7 @@ namespace NajaLang
 		return arrayExpr;
 	}
 
-	Expr* Parser::ParseTableExpr()
+	Expr *Parser::ParseTableExpr()
 	{
 		Consume(TOKEN_LEFT_BRACE, "Expect '{'.");
 
@@ -532,7 +581,7 @@ namespace NajaLang
 		return tableExpr;
 	}
 
-	Expr* Parser::ParsePrefixExpr()
+	Expr *Parser::ParsePrefixExpr()
 	{
 		auto prefixExpr = new PrefixExpr();
 		prefixExpr->op = GetCurTokenAndStepOnce().literal;
@@ -540,7 +589,7 @@ namespace NajaLang
 		return prefixExpr;
 	}
 
-	Expr* Parser::ParseInfixExpr(Expr* prefixExpr)
+	Expr *Parser::ParseInfixExpr(Expr *prefixExpr)
 	{
 		auto infixExpr = new InfixExpr();
 		infixExpr->left = prefixExpr;
@@ -549,7 +598,7 @@ namespace NajaLang
 		return infixExpr;
 	}
 
-	Expr* Parser::ParsePostfixExpr(Expr* prefixExpr)
+	Expr *Parser::ParsePostfixExpr(Expr *prefixExpr)
 	{
 		auto postfixExpr = new PostfixExpr();
 		postfixExpr->left = prefixExpr;
@@ -557,13 +606,13 @@ namespace NajaLang
 		return postfixExpr;
 	}
 
-	Expr* Parser::ParseTernaryExpr(Expr* prefixExpr)
+	Expr *Parser::ParseTernaryExpr(Expr *prefixExpr)
 	{
 		auto ternaryExpr = new TernaryExpr();
 
 		ternaryExpr->condition = prefixExpr;
 
-		ternaryExpr->firstOp = Consume(TOKEN_QUESTION,"Expect '?'.").literal;
+		ternaryExpr->firstOp = Consume(TOKEN_QUESTION, "Expect '?'.").literal;
 
 		ternaryExpr->trueBranch = ParseExpr();
 		ternaryExpr->secondOp = Consume(TOKEN_COLON, "Expect ':'").literal;
@@ -655,6 +704,15 @@ namespace NajaLang
 	{
 		if (IsMatchCurToken(type))
 			return GetCurTokenAndStepOnce();
+		std::cout << "[line " << GetCurToken().line << "]:" << errMsg << std::endl;
+		return m_Tokens.back();
+	}
+
+	Token Parser::Consume(std::vector<TokenType> type, std::string errMsg)
+	{
+		for (const auto &t : type)
+			if (IsMatchCurToken(t))
+				return GetCurTokenAndStepOnce();
 		std::cout << "[line " << GetCurToken().line << "]:" << errMsg << std::endl;
 		return m_Tokens.back();
 	}

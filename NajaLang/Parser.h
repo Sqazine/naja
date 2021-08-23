@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <cassert>
 #include <unordered_map>
 #include "Token.h"
 #include "Ast.h"
@@ -55,6 +56,7 @@ namespace NajaLang
 		Stmt *ParseBreakStmt();
 		Stmt *ParseContinueStmt();
 		Stmt *ParseFunctionStmt();
+		Stmt *ParseClassStmt();
 
 		Expr *ParseExpr(Precedence precedence = LOWEST);
 		Expr *ParseIdentifierExpr();
@@ -89,22 +91,11 @@ namespace NajaLang
 		bool IsMatchPreToken(TokenType type);
 
 		template <typename... T>
-		bool IsMatchCurToken(T... type);
-		template <typename... T>
-		bool IsMatchCurTokenAndStepOnce(T... type);
-
-		template <typename... T>
-		bool IsMatchNextToken(T... type);
-		template <typename... T>
-		bool IsMatchNextTokenAndStepOnce(T... type);
-
-		template <typename... T>
 		bool IsMatchPreToken(T... type);
 
 		Token Consume(TokenType type, std::string errMsg);
 
-		template <typename... T>
-		Token Consume(T... type, std::string errMsg);
+		Token Consume(std::vector<TokenType> type, std::string errMsg);
 
 		bool IsAtEnd();
 
@@ -117,56 +108,4 @@ namespace NajaLang
 		static std::unordered_map<TokenType, PostfixFn> m_PostfixFunctions;
 		static std::unordered_map<TokenType, Precedence> m_Precedence;
 	};
-	template <typename... T>
-	inline bool Parser::IsMatchCurToken(T... type)
-	{
-		assert((... && std::is_same_v<T, TokenType>));
-
-		if ((... || IsMatchCurToken(type)))
-			return true;
-		return false;
-	}
-	template <typename... T>
-	inline bool Parser::IsMatchCurTokenAndStepOnce(T... type)
-	{
-		assert((... && std::is_same_v<T, TokenType>));
-
-		if ((... || IsMatchCurTokenAndStepOnce(type)))
-			return true;
-		return false;
-	}
-	template <typename... T>
-	inline bool Parser::IsMatchNextToken(T... type)
-	{
-		assert((... && std::is_same_v<T, TokenType>));
-
-		if ((... || IsMatchNextToken(type)))
-			return true;
-		return false;
-	}
-	template <typename... T>
-	inline bool Parser::IsMatchNextTokenAndStepOnce(T... type)
-	{
-		assert((... && std::is_same_v<T, TokenType>));
-
-		if ((... || IsMatchNextTokenAndStepOnce(type)))
-			return true;
-		return false;
-	}
-	template <typename... T>
-	inline bool Parser::IsMatchPreToken(T... type)
-	{
-		assert((... && std::is_same_v<T, TokenType>));
-
-		if ((... || IsMatchPreToken(type)))
-			return true;
-		return false;
-	}
-	template <typename... T>
-	inline Token Parser::Consume(T... type, std::string errMsg)
-	{
-		assert((... && std::is_same_v<T, TokenType>));
-
-		return Consume(type, errMsg);
-	}
 }
