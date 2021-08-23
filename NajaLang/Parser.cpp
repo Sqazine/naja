@@ -6,6 +6,8 @@ namespace NajaLang
 	static NullExpr *nullExpr = new NullExpr();
 	static TrueExpr *trueExpr = new TrueExpr();
 	static FalseExpr *falseExpr = new FalseExpr();
+	static ThisExpr *thisExpr = new ThisExpr();
+	static BaseExpr *baseExpr = new BaseExpr();
 
 	std::unordered_map<TokenType, PrefixFn> Parser::m_PrefixFunctions =
 		{
@@ -25,6 +27,8 @@ namespace NajaLang
 			{TOKEN_FUNCTION, &Parser::ParseFunctionExpr},
 			{TOKEN_LEFT_BRACKET, &Parser::ParseArrayExpr},
 			{TOKEN_LEFT_BRACE, &Parser::ParseTableExpr},
+			{TOKEN_THIS, &Parser::ParseThisExpr},
+			{TOKEN_BASE, &Parser::ParseBaseExpr},
 
 	};
 
@@ -399,31 +403,34 @@ namespace NajaLang
 			{
 
 				if (IsMatchCurToken(TOKEN_FUNCTION))
-					classStmt->publicFunctions.emplace_back((FunctionStmt*)ParseFunctionStmt());
+					classStmt->publicFunctions.emplace_back((FunctionStmt *)ParseFunctionStmt());
 				else if (IsMatchCurToken(TOKEN_VAR))
-					classStmt->publicVars.emplace_back((VarStmt*)ParseVarStmt());
+					classStmt->publicVars.emplace_back((VarStmt *)ParseVarStmt());
 				else
 					Consume({TOKEN_FUNCTION, TOKEN_VAR}, "Expect 'function' or 'var' after 'public' keyword.");
 			}
 			else if (IsMatchCurTokenAndStepOnce(TOKEN_PROTECTED)) //protected function or variable
 			{
 				if (IsMatchCurToken(TOKEN_FUNCTION))
-					classStmt->protectedFunctions.emplace_back((FunctionStmt*)ParseFunctionStmt());
+					classStmt->protectedFunctions.emplace_back((FunctionStmt *)ParseFunctionStmt());
 				else if (IsMatchCurTokenAndStepOnce(TOKEN_VAR))
-					classStmt->protectedVars.emplace_back((VarStmt*)ParseVarStmt());
+					classStmt->protectedVars.emplace_back((VarStmt *)ParseVarStmt());
 				else
 					Consume({TOKEN_FUNCTION, TOKEN_VAR}, "Expect 'function' or 'var' after 'protected' keyword.");
 			}
 			else //private function or variable,'private' keyword is not the necessary
 			{
-				if(IsMatchCurToken(TOKEN_PRIVATE))
+				if (IsMatchCurToken(TOKEN_PRIVATE))
 					GetCurTokenAndStepOnce();
 				if (IsMatchCurTokenAndStepOnce(TOKEN_FUNCTION))
-					classStmt->privateFunctions.emplace_back((FunctionStmt*)ParseFunctionStmt());
+					classStmt->privateFunctions.emplace_back((FunctionStmt *)ParseFunctionStmt());
 				else if (IsMatchCurTokenAndStepOnce(TOKEN_VAR))
-					classStmt->privateVars.emplace_back((VarStmt*)ParseVarStmt());
+					classStmt->privateVars.emplace_back((VarStmt *)ParseVarStmt());
 				else
+				{
 					Consume({TOKEN_FUNCTION, TOKEN_VAR}, "only function or variable declaration is available in class scope.");
+					GetCurTokenAndStepOnce();
+				}
 			}
 		}
 
@@ -502,6 +509,17 @@ namespace NajaLang
 	{
 		Consume(TOKEN_FALSE, "Expect 'false' keyword");
 		return falseExpr;
+	}
+
+	Expr *Parser::ParseThisExpr()
+	{
+		Consume(TOKEN_THIS, "Expect 'this' keyword");
+		return thisExpr;
+	}
+	Expr *Parser::ParseBaseExpr()
+	{
+		Consume(TOKEN_BASE, "Expect 'base' keyword");
+		return baseExpr;
 	}
 
 	Expr *Parser::ParseGroupExpr()

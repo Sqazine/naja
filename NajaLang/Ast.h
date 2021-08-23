@@ -15,6 +15,8 @@ namespace NajaLang
 		TRUE_EXPR,
 		FALSE_EXPR,
 		IDENTIFIER_EXPR,
+		THIS_EXPR,
+		BASE_EXPR,
 		GROUP_EXPR,
 		FUNCTION_EXPR,
 		ARRAY_EXPR,
@@ -151,6 +153,24 @@ namespace NajaLang
 		AstType Type() override { return AstType::IDENTIFIER_EXPR; }
 
 		std::string literal;
+	};
+
+		struct ThisExpr:public Expr
+	{
+		ThisExpr() {}
+		~ThisExpr() {}
+
+		std::string Stringify() override { return "this"; }
+		AstType Type() override { return AstType::THIS_EXPR; }	
+	};
+
+	struct BaseExpr:public Expr
+	{
+		BaseExpr() {}
+		~BaseExpr() {}
+
+		std::string Stringify() override { return "base"; }
+		AstType Type() override { return AstType::BASE_EXPR; }	
 	};
 
 	struct ArrayExpr : public Expr
