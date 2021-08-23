@@ -21,6 +21,8 @@ namespace NajaLang
 			{"public", TOKEN_PUBLIC},
 			{"protected", TOKEN_PROTECTED},
 			{"private", TOKEN_PRIVATE},
+			{"this", TOKEN_THIS},
+			{"base", TOKEN_BASE},
 			{"operator", TOKEN_OPERATOR},
 			{"return", TOKEN_RETURN},
 	};
@@ -134,11 +136,10 @@ namespace NajaLang
 					if (IsMatchCurChar('\n'))
 						m_Line++;
 					else if (IsMatchCurChar('*') && IsMatchNextChar('/'))
-					{	
+					{
 						GetCurCharAndStepOnce();
 						GetCurCharAndStepOnce();
 						break;
-
 					}
 					else
 						GetCurCharAndStepOnce();

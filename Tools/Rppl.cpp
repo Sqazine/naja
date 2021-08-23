@@ -35,13 +35,11 @@ void RunFile(std::string path)
 
 int main(int argc, char** argv)
 {
-	// if (argc == 2)
-	// 	RunFile(argv[1]);
-	// else if (argc == 1)
-	// 	Rppl();
-	// else
-	// 	std::cout << "Usage: rlpl [filepath]" << std::endl;
-
-	RunFile("../class.naja");
+	if (argc == 2)
+		RunFile(argv[1]);
+	else if (argc == 1)
+		Rppl();
+	else
+		std::cout << "Usage: rlpl [filepath]" << std::endl;
 	return 0;
 }

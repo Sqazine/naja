@@ -74,6 +74,8 @@ namespace NajaLang
         TOKEN_PUBLIC,    // public
         TOKEN_PROTECTED, // protected
         TOKEN_PRIVATE,   // private
+        TOKEN_THIS,      // this
+        TOKEN_BASE,      // base
         TOKEN_OPERATOR,  // operator
         TOKEN_RETURN,    // return
 
