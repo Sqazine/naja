@@ -65,9 +65,11 @@ namespace NajaLang
 		Expr *ParseFalseExpr();
 		Expr* ParseFunctionExpr();
 		Expr* ParseArrayExpr();
+		Expr* ParseTableExpr();
 		Expr *ParsePrefixExpr();
 		Expr *ParseInfixExpr(Expr *prefixExpr);
 		Expr *ParsePostfixExpr(Expr *prefixExpr);
+		Expr* ParseTernaryExpr(Expr* prefixExpr);
 
 		Token GetCurToken();
 		Token GetCurTokenAndStepOnce();
