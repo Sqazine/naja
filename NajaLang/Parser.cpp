@@ -72,6 +72,9 @@ namespace NajaLang
 			{TOKEN_SLASH, &Parser::ParseInfixExpr},
 			{TOKEN_PERCENT, &Parser::ParseInfixExpr},
 
+
+			{TOKEN_LEFT_PAREN,&Parser::ParseFunctionCallExpr},
+
 	};
 
 	std::unordered_map<TokenType, PostfixFn> Parser::m_PostfixFunctions = {
@@ -125,11 +128,13 @@ namespace NajaLang
 		{TOKEN_SLASH, MUL_DIV_MOD},
 		{TOKEN_PERCENT, MUL_DIV_MOD},
 
+		{TOKEN_LEFT_BRACKET, INFIX},
+		{TOKEN_LEFT_PAREN, INFIX},
+		
 		{TOKEN_PLUS_PLUS, POSTFIX},
 		{TOKEN_MINUS_MINUS, POSTFIX},
 
-		{TOKEN_LEFT_BRACKET, POSTFIX},
-		{TOKEN_LEFT_PAREN, POSTFIX},
+
 	};
 
 	Parser::Parser()
@@ -681,6 +686,22 @@ namespace NajaLang
 		Consume(TOKEN_RIGHT_BRACKET, "Expect ']'.");
 		return indexExpr;
 	}
+
+		Expr* Parser::ParseFunctionCallExpr(Expr* prefixExpr)
+		{
+			auto funcCallExpr=new FunctionCallExpr();
+			funcCallExpr->function=prefixExpr;
+			Consume(TOKEN_LEFT_PAREN,"Expect '('.");
+			if(!IsMatchCurToken(TOKEN_RIGHT_PAREN))//has arguments
+			{
+				funcCallExpr->arguments.emplace_back(ParseExpr());
+				while(IsMatchCurTokenAndStepOnce(TOKEN_COMMA))
+					funcCallExpr->arguments.emplace_back(ParseExpr());
+			}
+			Consume(TOKEN_RIGHT_PAREN,"Expect ')'.");
+
+			return funcCallExpr;
+		}
 
 	Token Parser::GetCurToken()
 	{

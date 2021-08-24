@@ -26,6 +26,7 @@ namespace NajaLang
 		POSTFIX_EXPR,
 		TERNARY_EXPR,
 		INDEX_EXPR,
+		FUNCTION_CALL_EXPR,
 
 		VAR_STMT,
 		EXPR_STMT,
@@ -294,23 +295,48 @@ namespace NajaLang
 		Expr *falseBranch;
 	};
 
-	struct IndexExpr:public Expr
+	struct IndexExpr : public Expr
 	{
-		IndexExpr(){}
-		IndexExpr(Expr* array,Expr* index):array(array),index(index){}
+		IndexExpr() {}
+		IndexExpr(Expr *array, Expr *index) : array(array), index(index) {}
 		~IndexExpr()
 		{
 			delete array;
-			array=nullptr;
+			array = nullptr;
 			delete index;
-			index=nullptr;
+			index = nullptr;
 		}
-		std::string Stringify() override { return array->Stringify() + "[" + index->Stringify() +"]"; }
-		
+		std::string Stringify() override { return array->Stringify() + "[" + index->Stringify() + "]"; }
+
 		AstType Type() override { return AstType::INDEX_EXPR; }
 
-		Expr* array;
-		Expr* index;
+		Expr *array;
+		Expr *index;
+	};
+
+	struct FunctionCallExpr : public Expr
+	{
+		FunctionCallExpr() {}
+		FunctionCallExpr(Expr *function, std::vector<Expr *> arguments) : function(function), arguments(arguments) {}
+		~FunctionCallExpr() {}
+
+		std::string Stringify() override
+		{
+			std::string result = function->Stringify() + "(";
+
+			if (!arguments.empty())
+			{
+				for (const auto &arg : arguments)
+					result += arg->Stringify() + ",";
+				result = result.substr(0, result.size() - 1);
+			}
+			result+=")";
+			return result;
+		}
+		AstType Type() override { return AstType::FUNCTION_CALL_EXPR; }
+
+		Expr *function;
+		std::vector<Expr *> arguments;
 	};
 
 	struct Stmt : public AstNode
@@ -587,7 +613,7 @@ namespace NajaLang
 				if (!privateInherits.empty())
 					for (auto priIn : privateInherits)
 						result += "private " + priIn->Stringify() + ",\n";
-			
+
 				result = result.substr(0, result.size() - 2);
 			}
 			result += "\n{\n";
