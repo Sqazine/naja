@@ -76,7 +76,7 @@ namespace NajaLang
         TOKEN_PRIVATE,   // private
         TOKEN_THIS,      // this
         TOKEN_BASE,      // base
-        TOKEN_OPERATOR,  // operator
+        TOKEN_NEW,// new
         TOKEN_RETURN,    // return
 
         TOKEN_UNDEFINED,

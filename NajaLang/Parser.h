@@ -74,6 +74,7 @@ namespace NajaLang
 		Expr *ParseFunctionExpr();
 		Expr *ParseArrayExpr();
 		Expr *ParseTableExpr();
+		Expr *ParseNewExpr();
 		Expr *ParsePrefixExpr();
 		Expr *ParseInfixExpr(Expr *prefixExpr);
 		Expr *ParsePostfixExpr(Expr *prefixExpr);

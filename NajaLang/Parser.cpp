@@ -29,6 +29,7 @@ namespace NajaLang
 			{TOKEN_LEFT_BRACE, &Parser::ParseTableExpr},
 			{TOKEN_THIS, &Parser::ParseThisExpr},
 			{TOKEN_BASE, &Parser::ParseBaseExpr},
+			{TOKEN_NEW,&Parser::ParseNewExpr},
 
 	};
 
@@ -638,6 +639,16 @@ namespace NajaLang
 
 		return tableExpr;
 	}
+
+			Expr *Parser::ParseNewExpr()
+			{
+				Consume(TOKEN_NEW,"Expect 'new'.");
+				auto newExpr=new NewExpr();
+
+				newExpr->object=ParseExpr();
+
+				return newExpr;
+			}
 
 	Expr *Parser::ParsePrefixExpr()
 	{

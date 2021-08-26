@@ -28,6 +28,7 @@ namespace NajaLang
 		INDEX_EXPR,
 		FUNCTION_CALL_EXPR,
 		CLASS_CALL_EXPR,
+		NEW_EXPR,
 
 		VAR_STMT,
 		EXPR_STMT,
@@ -361,6 +362,22 @@ namespace NajaLang
 
 		Expr *classInstance;
 		Expr *callee;
+	};
+
+	struct NewExpr:public Expr
+	{
+		NewExpr():object(nullptr){}
+		NewExpr(Expr* object):object(object){}
+		~NewExpr(){}
+
+		std::string Stringify() override
+		{
+			return "new " +object->Stringify();
+		}
+		AstType Type() override { return AstType::NEW_EXPR; }
+		
+
+		Expr* object;
 	};
 
 	struct Stmt : public AstNode

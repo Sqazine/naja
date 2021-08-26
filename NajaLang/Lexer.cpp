@@ -23,7 +23,7 @@ namespace NajaLang
 			{"private", TOKEN_PRIVATE},
 			{"this", TOKEN_THIS},
 			{"base", TOKEN_BASE},
-			{"operator", TOKEN_OPERATOR},
+			{"new", TOKEN_NEW},
 			{"return", TOKEN_RETURN},
 	};
 
