@@ -27,6 +27,7 @@ namespace NajaLang
 		TERNARY_EXPR,
 		INDEX_EXPR,
 		FUNCTION_CALL_EXPR,
+		CLASS_CALL_EXPR,
 
 		VAR_STMT,
 		EXPR_STMT,
@@ -330,13 +331,36 @@ namespace NajaLang
 					result += arg->Stringify() + ",";
 				result = result.substr(0, result.size() - 1);
 			}
-			result+=")";
+			result += ")";
 			return result;
 		}
 		AstType Type() override { return AstType::FUNCTION_CALL_EXPR; }
 
 		Expr *function;
 		std::vector<Expr *> arguments;
+	};
+
+	struct ClassCallExpr : public Expr
+	{
+		ClassCallExpr() : classInstance(nullptr) {}
+		ClassCallExpr(Expr *classInstance, Expr *callee) {}
+		~ClassCallExpr()
+		{
+			delete classInstance;
+			classInstance = nullptr;
+
+			delete callee;
+			callee = nullptr;
+		}
+
+		std::string Stringify() override
+		{
+			return classInstance->Stringify() + "." +callee->Stringify();
+		}
+		AstType Type() override { return AstType::FUNCTION_CALL_EXPR; }
+
+		Expr *classInstance;
+		Expr *callee;
 	};
 
 	struct Stmt : public AstNode

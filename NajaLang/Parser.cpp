@@ -72,8 +72,8 @@ namespace NajaLang
 			{TOKEN_SLASH, &Parser::ParseInfixExpr},
 			{TOKEN_PERCENT, &Parser::ParseInfixExpr},
 
-
-			{TOKEN_LEFT_PAREN,&Parser::ParseFunctionCallExpr},
+			{TOKEN_LEFT_PAREN, &Parser::ParseFunctionCallExpr},
+			{TOKEN_DOT, &Parser::ParseClassCallExpr},
 
 	};
 
@@ -85,6 +85,7 @@ namespace NajaLang
 	};
 
 	std::unordered_map<TokenType, Precedence> Parser::m_Precedence = {
+
 		{TOKEN_EQUAL, ASSIGN},
 		{TOKEN_PLUS_EQUAL, ASSIGN},
 		{TOKEN_MINUS_EQUAL, ASSIGN},
@@ -130,11 +131,11 @@ namespace NajaLang
 
 		{TOKEN_LEFT_BRACKET, INFIX},
 		{TOKEN_LEFT_PAREN, INFIX},
-		
+
 		{TOKEN_PLUS_PLUS, POSTFIX},
 		{TOKEN_MINUS_MINUS, POSTFIX},
 
-
+		{TOKEN_DOT, CLASS_CALL},
 	};
 
 	Parser::Parser()
@@ -687,21 +688,34 @@ namespace NajaLang
 		return indexExpr;
 	}
 
-		Expr* Parser::ParseFunctionCallExpr(Expr* prefixExpr)
+	Expr *Parser::ParseFunctionCallExpr(Expr *prefixExpr)
+	{
+		auto funcCallExpr = new FunctionCallExpr();
+		funcCallExpr->function = prefixExpr;
+		Consume(TOKEN_LEFT_PAREN, "Expect '('.");
+		if (!IsMatchCurToken(TOKEN_RIGHT_PAREN)) //has arguments
 		{
-			auto funcCallExpr=new FunctionCallExpr();
-			funcCallExpr->function=prefixExpr;
-			Consume(TOKEN_LEFT_PAREN,"Expect '('.");
-			if(!IsMatchCurToken(TOKEN_RIGHT_PAREN))//has arguments
-			{
+			funcCallExpr->arguments.emplace_back(ParseExpr());
+			while (IsMatchCurTokenAndStepOnce(TOKEN_COMMA))
 				funcCallExpr->arguments.emplace_back(ParseExpr());
-				while(IsMatchCurTokenAndStepOnce(TOKEN_COMMA))
-					funcCallExpr->arguments.emplace_back(ParseExpr());
-			}
-			Consume(TOKEN_RIGHT_PAREN,"Expect ')'.");
-
-			return funcCallExpr;
 		}
+		Consume(TOKEN_RIGHT_PAREN, "Expect ')'.");
+
+		return funcCallExpr;
+	}
+
+	Expr *Parser::ParseClassCallExpr(Expr *prefixExpr)
+	{
+		Consume(TOKEN_DOT, "Expect '.'.");
+
+		auto classCallExpr = new ClassCallExpr();
+
+		classCallExpr->classInstance = prefixExpr;
+
+		classCallExpr->callee=ParseExpr(CLASS_CALL);
+
+		return classCallExpr;
+	}
 
 	Token Parser::GetCurToken()
 	{
