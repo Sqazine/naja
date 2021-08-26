@@ -29,7 +29,7 @@ namespace NajaLang
 			{TOKEN_LEFT_BRACE, &Parser::ParseTableExpr},
 			{TOKEN_THIS, &Parser::ParseThisExpr},
 			{TOKEN_BASE, &Parser::ParseBaseExpr},
-			{TOKEN_NEW,&Parser::ParseNewExpr},
+			{TOKEN_NEW, &Parser::ParseNewExpr},
 
 	};
 
@@ -155,10 +155,29 @@ namespace NajaLang
 		return ParseAstStmts();
 	}
 
+	bool Parser::HasError()
+	{
+		return !m_ErrorMsgs.empty();
+	}
+
+	const std::vector<std::string> &Parser::GetErrors() const
+	{
+		return m_ErrorMsgs;
+	}
+
+	void Parser::PrintErrors()
+	{
+		std::cout<<"Parse Error:"<<std::endl;
+		for (const auto &err : m_ErrorMsgs)
+			std::cout << err << std::endl;
+	}
+
 	void Parser::ResetStatus()
 	{
 		m_CurPos = 0;
+
 		std::vector<Token>().swap(m_Tokens);
+		std::vector<std::string>().swap(m_ErrorMsgs);
 
 		if (m_Stmts != nullptr)
 		{
@@ -640,15 +659,15 @@ namespace NajaLang
 		return tableExpr;
 	}
 
-			Expr *Parser::ParseNewExpr()
-			{
-				Consume(TOKEN_NEW,"Expect 'new'.");
-				auto newExpr=new NewExpr();
+	Expr *Parser::ParseNewExpr()
+	{
+		Consume(TOKEN_NEW, "Expect 'new'.");
+		auto newExpr = new NewExpr();
 
-				newExpr->object=ParseExpr();
+		newExpr->object = ParseExpr();
 
-				return newExpr;
-			}
+		return newExpr;
+	}
 
 	Expr *Parser::ParsePrefixExpr()
 	{
@@ -723,7 +742,7 @@ namespace NajaLang
 
 		classCallExpr->classInstance = prefixExpr;
 
-		classCallExpr->callee=ParseExpr(CLASS_CALL);
+		classCallExpr->callee = ParseExpr(CLASS_CALL);
 
 		return classCallExpr;
 	}
@@ -812,7 +831,7 @@ namespace NajaLang
 	{
 		if (IsMatchCurToken(type))
 			return GetCurTokenAndStepOnce();
-		std::cout << "[line " << GetCurToken().line << "]:" << errMsg << std::endl;
+		m_ErrorMsgs.emplace_back("[line "+ std::to_string(GetCurToken().line) +"]:"+ errMsg);
 		return m_Tokens.back();
 	}
 
@@ -821,7 +840,7 @@ namespace NajaLang
 		for (const auto &t : type)
 			if (IsMatchCurToken(t))
 				return GetCurTokenAndStepOnce();
-		std::cout << "[line " << GetCurToken().line << "]:" << errMsg << std::endl;
+		m_ErrorMsgs.emplace_back("[line "+ std::to_string(GetCurToken().line) +"]:"+ errMsg);
 		return m_Tokens.back();
 	}
 

@@ -14,6 +14,9 @@ void Rppl()
 		auto tokens = lexer.ScanTokens(line);
 		auto stmts = parser.Parse(tokens);
 
+		if (parser.HasError())
+			parser.PrintErrors();
+
 		std::cout << stmts->Stringify() << std::endl;
 
 		std::cout << "> ";
@@ -30,10 +33,13 @@ void RunFile(std::string path)
 
 	auto stmts = parser.Parse(tokens);
 
+	if (parser.HasError())
+			parser.PrintErrors();
+
 	std::cout << stmts->Stringify() << std::endl;
 }
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
 	if (argc == 2)
 		RunFile(argv[1]);

@@ -43,7 +43,10 @@ namespace NajaLang
 		~Parser();
 
 		Stmt *Parse(const std::vector<Token> &tokens);
-
+		
+		bool HasError();
+		const std::vector<std::string>& GetErrors() const;
+		void PrintErrors();
 	private:
 		void ResetStatus();
 
@@ -116,5 +119,7 @@ namespace NajaLang
 		static std::unordered_map<TokenType, InfixFn> m_InfixFunctions;
 		static std::unordered_map<TokenType, PostfixFn> m_PostfixFunctions;
 		static std::unordered_map<TokenType, Precedence> m_Precedence;
+
+		std::vector<std::string> m_ErrorMsgs;
 	};
 }
