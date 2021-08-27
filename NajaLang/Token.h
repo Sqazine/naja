@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 #include <string>
-
+#include <string_view>
 #include <ostream>
 namespace NajaLang
 {
@@ -85,7 +85,7 @@ namespace NajaLang
 
     struct Token
     {
-        Token(TokenType type, std::string literal, uint64_t line) : type(type), literal(literal), line(line) {}
+        Token(TokenType type, std::string_view literal, uint64_t line) : type(type), literal(literal), line(line) {}
 
         TokenType type;
         std::string literal;

@@ -4,7 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
-inline std::string ReadFile(std::string path)
+inline std::string ReadFile(std::string_view path)
 {
     std::fstream file;
     file.open(path.data(), std::ios::in | std::ios::binary);

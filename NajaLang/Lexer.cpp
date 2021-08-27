@@ -35,7 +35,7 @@ namespace NajaLang
 	{
 	}
 
-	const std::vector<Token> &Lexer::ScanTokens(std::string src)
+	const std::vector<Token> &Lexer::ScanTokens(std::string_view src)
 	{
 		ResetStatus();
 		m_Source = src;
@@ -290,7 +290,7 @@ namespace NajaLang
 		auto literal = m_Source.substr(m_StartPos, m_CurPos - m_StartPos);
 		m_Tokens.emplace_back(Token(type, literal, m_Line));
 	}
-	void Lexer::AddToken(TokenType type, std::string literal)
+	void Lexer::AddToken(TokenType type, std::string_view literal)
 	{
 		m_Tokens.emplace_back(Token(type, literal, m_Line));
 	}
@@ -342,10 +342,10 @@ namespace NajaLang
 		std::string literal = m_Source.substr(m_StartPos, m_CurPos - m_StartPos);
 
 		bool isKeyWord = false;
-		for (const auto &keyword : keywords)
-			if (keyword.first.compare(literal) == 0)
+		for (const auto &[key,value] : keywords)
+			if (key.compare(literal) == 0)
 			{
-				AddToken(keyword.second, literal);
+				AddToken(value, literal);
 				isKeyWord = true;
 				break;
 			}

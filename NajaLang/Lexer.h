@@ -12,7 +12,7 @@ namespace NajaLang
         Lexer();
         ~Lexer();
 
-       const std::vector<Token>& ScanTokens(std::string src);
+       const std::vector<Token>& ScanTokens(std::string_view src);
     private:
 
         void ScanToken();
@@ -30,7 +30,7 @@ namespace NajaLang
         char GetCurChar();
 
         void AddToken(TokenType type);
-        void AddToken(TokenType type,std::string literal);
+        void AddToken(TokenType type,std::string_view literal);
 
         bool IsAtEnd();
 

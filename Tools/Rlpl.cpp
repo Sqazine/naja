@@ -18,7 +18,7 @@ void Rlpl()
     }
 }
 
-void RunFile(std::string path)
+void RunFile(std::string_view path)
 {
     std::string content = ReadFile(path);
     NajaLang::Lexer lexer;

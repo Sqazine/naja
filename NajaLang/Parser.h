@@ -105,9 +105,9 @@ namespace NajaLang
 		template <typename... T>
 		bool IsMatchPreToken(T... type);
 
-		Token Consume(TokenType type, std::string errMsg);
+		Token Consume(TokenType type, std::string_view errMsg);
 
-		Token Consume(std::vector<TokenType> type, std::string errMsg);
+		Token Consume(std::vector<TokenType> type, std::string_view errMsg);
 
 		bool IsAtEnd();
 

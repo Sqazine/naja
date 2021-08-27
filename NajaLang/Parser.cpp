@@ -827,20 +827,20 @@ namespace NajaLang
 		return GetPreToken().type == type;
 	}
 
-	Token Parser::Consume(TokenType type, std::string errMsg)
+	Token Parser::Consume(TokenType type, std::string_view errMsg)
 	{
 		if (IsMatchCurToken(type))
 			return GetCurTokenAndStepOnce();
-		m_ErrorMsgs.emplace_back("[line "+ std::to_string(GetCurToken().line) +"]:"+ errMsg);
+		m_ErrorMsgs.emplace_back("[line "+ std::to_string(GetCurToken().line) +"]:"+ std::string(errMsg));
 		return m_Tokens.back();
 	}
 
-	Token Parser::Consume(std::vector<TokenType> type, std::string errMsg)
+	Token Parser::Consume(std::vector<TokenType> type, std::string_view errMsg)
 	{
 		for (const auto &t : type)
 			if (IsMatchCurToken(t))
 				return GetCurTokenAndStepOnce();
-		m_ErrorMsgs.emplace_back("[line "+ std::to_string(GetCurToken().line) +"]:"+ errMsg);
+		m_ErrorMsgs.emplace_back("[line "+ std::to_string(GetCurToken().line) +"]:"+ std::string(errMsg));
 		return m_Tokens.back();
 	}
 

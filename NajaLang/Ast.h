@@ -88,7 +88,7 @@ namespace NajaLang
 	struct StrExpr : public Expr
 	{
 		StrExpr() {}
-		StrExpr(std::string str) : value(str) {}
+		StrExpr(std::string_view str) : value(str) {}
 
 		std::string Stringify() override { return value; }
 		AstType Type() override { return AstType::STR_EXPR; }
@@ -126,7 +126,7 @@ namespace NajaLang
 	struct IdentifierExpr : public Expr
 	{
 		IdentifierExpr() {}
-		IdentifierExpr(std::string literal) : literal(literal) {}
+		IdentifierExpr(std::string_view literal) : literal(literal) {}
 		~IdentifierExpr() {}
 
 		std::string Stringify() override { return literal; }
@@ -192,8 +192,8 @@ namespace NajaLang
 
 			if (!elements.empty())
 			{
-				for (auto e : elements)
-					result += e.first->Stringify() + ":" + e.second->Stringify() + ",";
+				for (auto [key,value] : elements)
+					result += key->Stringify() + ":" + value->Stringify() + ",";
 				result = result.substr(0, result.size() - 1);
 			}
 			result += "}";
@@ -219,7 +219,7 @@ namespace NajaLang
 	struct PrefixExpr : public Expr
 	{
 		PrefixExpr() : right(nullptr) {}
-		PrefixExpr(std::string op, Expr *right) : op(op), right(right) {}
+		PrefixExpr(std::string_view op, Expr *right) : op(op), right(right) {}
 		~PrefixExpr()
 		{
 			delete right;
@@ -236,7 +236,7 @@ namespace NajaLang
 	struct InfixExpr : public Expr
 	{
 		InfixExpr() : left(nullptr), right(nullptr) {}
-		InfixExpr(std::string op, Expr *left, Expr *right) : op(op), left(left), right(right) {}
+		InfixExpr(std::string_view op, Expr *left, Expr *right) : op(op), left(left), right(right) {}
 		~InfixExpr()
 		{
 			delete left;
@@ -257,7 +257,7 @@ namespace NajaLang
 	struct PostfixExpr : public Expr
 	{
 		PostfixExpr() : left(nullptr) {}
-		PostfixExpr(Expr *left, std::string op) : op(op), left(left) {}
+		PostfixExpr(Expr *left, std::string_view op) : op(op), left(left) {}
 		~PostfixExpr()
 		{
 			delete left;
@@ -274,7 +274,7 @@ namespace NajaLang
 	struct TernaryExpr : public Expr
 	{
 		TernaryExpr() : condition(nullptr), trueBranch(nullptr), falseBranch(nullptr) {}
-		TernaryExpr(std::string firstOp, std::string secondOp, Expr *condition, Expr *trueBranch, Expr *falseBranch) : firstOp(firstOp), secondOp(secondOp), condition(condition), trueBranch(trueBranch), falseBranch(falseBranch)
+		TernaryExpr(std::string_view firstOp, std::string_view secondOp, Expr *condition, Expr *trueBranch, Expr *falseBranch) : firstOp(firstOp), secondOp(secondOp), condition(condition), trueBranch(trueBranch), falseBranch(falseBranch)
 		{
 		}
 		~TernaryExpr()
@@ -416,8 +416,8 @@ namespace NajaLang
 			std::string result = "var ";
 			if (!variables.empty())
 			{
-				for (const auto &variable : variables)
-					result += variable.first->Stringify() + "=" + variable.second->Stringify() + ",";
+				for (const auto &[key,value] : variables)
+					result += key->Stringify() + "=" + value->Stringify() + ",";
 				result = result.substr(0, result.size() - 1);
 			}
 			result += ";";
