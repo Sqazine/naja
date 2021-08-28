@@ -25,3 +25,4 @@ target_link_libraries(rppl PUBLIC libNajaLang)
 add_executable(rcpl ${CMAKE_SOURCE_DIR}/Tools/Rcpl.cpp)
 target_include_directories(rcpl PUBLIC ${CMAKE_SOURCE_DIR}/NajaLang)
 target_link_libraries(rcpl PUBLIC libNajaLang)
+

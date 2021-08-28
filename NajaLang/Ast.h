@@ -1,12 +1,12 @@
 #pragma once
 #include <string>
 #include <map>
-
+#include <unordered_map>
 #include <vector>
 #include <memory>
 namespace NajaLang
 {
-	enum class AstType
+	enum AstType
 	{
 		FLOAT_NUM_EXPR,
 		INT_NUM_EXPR,

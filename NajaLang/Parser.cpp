@@ -1,14 +1,8 @@
 #include "Parser.h"
 #include <iostream>
+#include "Constant.h"
 namespace NajaLang
 {
-
-	static NullExpr *nullExpr = new NullExpr();
-	static TrueExpr *trueExpr = new TrueExpr();
-	static FalseExpr *falseExpr = new FalseExpr();
-	static ThisExpr *thisExpr = new ThisExpr();
-	static BaseExpr *baseExpr = new BaseExpr();
-
 	std::unordered_map<TokenType, PrefixFn> Parser::m_PrefixFunctions =
 		{
 			{TOKEN_IDENTIFIER, &Parser::ParseIdentifierExpr},
@@ -257,7 +251,12 @@ namespace NajaLang
 	Stmt *Parser::ParseReturnStmt()
 	{
 		Consume(TOKEN_RETURN, "Expect 'return' key word.");
-		auto returnStmt = new ReturnStmt(ParseExpr());
+
+		auto returnStmt = new ReturnStmt();
+
+		if(!IsMatchCurToken(TOKEN_SEMICOLON))
+			returnStmt->expr=ParseExpr();
+
 		Consume(TOKEN_SEMICOLON, "Expect ';' after return stmt");
 		return returnStmt;
 	}

@@ -12,12 +12,12 @@ void Rppl()
 	while (getline(std::cin, line))
 	{
 		auto tokens = lexer.ScanTokens(line);
-		auto stmts = parser.Parse(tokens);
+		auto stmt = parser.Parse(tokens);
 
 		if (parser.HasError())
 			parser.PrintErrors();
 
-		std::cout << stmts->Stringify() << std::endl;
+		std::cout << stmt->Stringify() << std::endl;
 
 		std::cout << "> ";
 	}
@@ -46,6 +46,6 @@ int main(int argc, char **argv)
 	else if (argc == 1)
 		Rppl();
 	else
-		std::cout << "Usage: rlpl [filepath]" << std::endl;
+		std::cout << "Usage: rppl [filepath]" << std::endl;
 	return 0;
 }
